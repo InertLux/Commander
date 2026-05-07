@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Hand - Hex Tactical Battler</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .game-area {
+            flex: 1;
+            background: linear-gradient(135deg, #2a3a2a 0%, #1a2a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 18px;
+            text-align: center;
+            position: relative;
+        }
+        #dragCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .card-hand-wrapper {
+            position: relative;
+            background: #0f0f0f;
+            border-top: 2px solid #444;
+            min-height: 180px;
+            overflow: visible;
+        }
+        .card-hand {
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            align-items: flex-end;
+            position: relative;
+            z-index: 100;
+        }
+        .card {
+            flex-shrink: 0;
+            width: 120px;
+            height: 160px;
+            background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%);
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: grab;
+            transition: all 0.1s;
+            color: #ddd;
+            font-size: 13px;
+            user-select: none;
+        }
+        .card:hover:not(.dragging) {
+            transform: translateY(-8px);
+            border-color: #88f;
+            box-shadow: 0 8px 16px rgba(136, 136, 255, 0.3);
+        }
+        .card.dragging {
+            transform: translateY(-80px);
+            border-color: #0f0;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5),
+                        inset 0 0 10px rgba(0, 255, 0, 0.2);
+            cursor: grabbing;
+            opacity: 0.9;
+            position: relative;
+            z-index: 101;
+        }
+        .card.disappearing {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        .card-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .card-cost {
+            background: #444;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            align-self: flex-start;
+            margin-bottom: 4px;
+        }
+        .card-description {
+            font-size: 11px;
+            color: #bbb;
+            flex: 1;
+            margin-bottom: 8px;
+        }
+        .card-stats {
+            font-size: 12px;
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        .card-type {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+        .hero-token {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f0f;
+            border-radius: 50%;
+            background: radial-gradient(circle, #4a0a4a 0%, #1a001a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f0f;
+            font-weight: bold;
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 102;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-area">
+        <canvas id="dragCanvas"></canvas>
+        Game Area (Hex Board)
+    </div>
+    <div class="card-hand-wrapper">
+        <div class="card-hand" id="cardHand">
+            <div class="card" data-card-id="1" data-type="cast">
+                <div class="card-cost">3</div>
+                <div class="card-title">Knight Charge</div>
+                <div class="card-description">Move unit forward 2 hexes and attack.</div>
+                <div class="card-stats">
+                    <span>ATK: 5</span>
+                    <span>SPD: 3</span>
+                </div>
+                <div class="card-type">CAST</div>
+            </div>
+            <div class="card" data-card-id="2" data-type="cast">
+                <div class="card-cost">2</div>
+                <div class="card-title">Shield Wall</div>
+                <div class="card-description">Grant armor to adjacent units.</div>
+                <div class="card-stats">
+                    <span>DEF: 4</span>
+                    <span>RNG: 1</span>
+                </div>
+                <div class="card-type">CAST</div>
+            </div>
+            <div class="card" data-card-id="3" data-type="cast">
+                <div class="card-cost">4</div>
+                <div class="card-title">Fireball</div>
+                <div class="card-description">Damage in 2-hex radius area.</div>
+                <div class="card-stats">
+                    <span>DMG: 6</span>
+                    <span>RNG: 5</span>
+                </div>
+                <div class="card-type">CAST</div>
+            </div>
+            <div class="card" data-card-id="4" data-type="cast">
+                <div class="card-cost">1</div>
+                <div class="card-title">Quick Step</div>
+                <div class="card-description">Move any unit 1 hex.</div>
+                <div class="card-stats">
+                    <span>SPD: 1</span>
+                    <span>RNG: ∞</span>
+                </div>
+                <div class="card-type">CAST</div>
+            </div>
+            <div class="card" data-card-id="5" data-type="summon">
+                <div class="card-cost">5</div>
+                <div class="card-title">Summon Beast</div>
+                <div class="card-description">Summon creature on board.</div>
+                <div class="card-stats">
+                    <span>HP: 8</span>
+                    <span>ATK: 4</span>
+                </div>
+                <div class="card-type">SUMMON</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameArea = document.querySelector('.game-area');
+        const canvas = document.getElementById('dragCanvas');
+        const ctx = canvas.getContext('2d');
+        const cardHand = document.getElementById('cardHand');
+
+        let draggingCard = null;
+        let mousePos = { x: 0, y: 0 };
+        let cardPos = { x: 0, y: 0 };
+        let heroToken = null;
+
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = gameArea.offsetWidth;
+            canvas.height = gameArea.offsetHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Mouse tracking
+        gameArea.addEventListener('mousemove', (e) => {
+            const rect = gameArea.getBoundingClientRect();
+            mousePos.x = e.clientX - rect.left;
+            mousePos.y = e.clientY - rect.top;
+
+            if (draggingCard) {
+                const cardType = draggingCard.getAttribute('data-type');
+                if (cardType === 'cast') {
+                    drawCastEffect();
+                } else if (cardType === 'summon') {
+                    updateHeroToken();
+                }
+            }
+        });
+
+        gameArea.addEventListener('mouseleave', () => {
+            if (draggingCard) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (heroToken) heroToken.style.display = 'none';
+            }
+        });
+
+        // Physics-based parabolic trajectory
+        function getParabolicPoint(t, startX, startY, endX, endY) {
+            const dx = endX - startX;
+            const dy = endY - startY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Gravity effect scales with distance (subtle for short, extreme for long)
+            const gravity = Math.max(20, distance * 0.15);
+            
+            const x = startX + dx * t;
+            const peak = startY - gravity * 0.5;
+            const y = startY + dy * t + (peak - startY) * 4 * t * (1 - t);
+            
+            return { x, y };
+        }
+
+        // Draw cast effect (projectile arc + target)
+        function drawCastEffect() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw parabolic projectile line
+            ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+
+            for (let t = 0; t <= 1; t += 0.05) {
+                const point = getParabolicPoint(t, cardPos.x, cardPos.y, mousePos.x, mousePos.y);
+                if (t === 0) {
+                    ctx.moveTo(point.x, point.y);
+                } else {
+                    ctx.lineTo(point.x, point.y);
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw impact target reticle
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+            ctx.lineWidth = 2;
+
+            // Outer explosion ring
+            ctx.beginPath();
+            ctx.arc(mousePos.x, mousePos.y, 25, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Inner blast circle
+            ctx.beginPath();
+            ctx.arc(mousePos.x, mousePos.y, 12, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Crosshairs for targeting
+            ctx.strokeStyle = 'rgba(255, 100, 100, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(mousePos.x - 15, mousePos.y);
+            ctx.lineTo(mousePos.x + 15, mousePos.y);
+            ctx.moveTo(mousePos.x, mousePos.y - 15);
+            ctx.lineTo(mousePos.x, mousePos.y + 15);
+            ctx.stroke();
+        }
+
+        // Create/update hero token for summon cards
+        function updateHeroToken() {
+            if (!heroToken) {
+                heroToken = document.createElement('div');
+                heroToken.className = 'hero-token';
+                heroToken.textContent = '⚔';
+                gameArea.appendChild(heroToken);
+            }
+            heroToken.style.left = mousePos.x + 'px';
+            heroToken.style.top = mousePos.y + 'px';
+            heroToken.style.display = 'block';
+        }
+
+        // Card mousedown - initiates drag
+        cardHand.addEventListener('mousedown', (e) => {
+            const card = e.target.closest('.card');
+            if (card) {
+                draggingCard = card;
+                card.classList.add('dragging');
+
+                const rect = card.getBoundingClientRect();
+                const gameRect = gameArea.getBoundingClientRect();
+                cardPos.x = rect.left - gameRect.left + rect.width / 2;
+                cardPos.y = rect.top - gameRect.top + rect.height / 2;
+
+                gameArea.style.cursor = 'grabbing';
+            }
+        });
+
+        // Drop on game area
+        gameArea.addEventListener('mouseup', (e) => {
+            if (draggingCard) {
+                const gameRect = gameArea.getBoundingClientRect();
+                const dropX = e.clientX - gameRect.left;
+                const dropY = e.clientY - gameRect.top;
+
+                // Check if drop is within game area
+                if (dropX >= 0 && dropX <= gameArea.offsetWidth &&
+                    dropY >= 0 && dropY <= gameArea.offsetHeight) {
+                    
+                    draggingCard.classList.remove('dragging');
+                    draggingCard.classList.add('disappearing');
+                    
+                    setTimeout(() => {
+                        draggingCard.remove();
+                    }, 300);
+                }
+
+                draggingCard = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (heroToken) heroToken.style.display = 'none';
+                gameArea.style.cursor = 'default';
+            }
+        });
+
+        // Cancel drag on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && draggingCard) {
+                draggingCard.classList.remove('dragging');
+                draggingCard = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (heroToken) heroToken.style.display = 'none';
+                gameArea.style.cursor = 'default';
+            }
+        });
+    </script>
+</body>
+</html>

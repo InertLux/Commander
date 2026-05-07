@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TACTICAL_OS_V1.0</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background: #000;
+            color: #00FF00; /* Classic Terminal Green */
+            font-family: "Courier New", Courier, monospace;
+            font-size: 11px;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* RAW 90S BORDERS */
+        .outset { border: 2px solid; border-color: #eee #555 #555 #eee; background: #222; }
+        .inset { border: 2px solid; border-color: #555 #eee #eee #555; background: #000; }
+
+        #sidebar {
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* HEADER */
+        .profile-block { padding: 4px; display: grid; grid-template-columns: 40px 1fr; gap: 6px; }
+        .portrait { width: 40px; height: 40px; background: #444; border: 1px solid #00FF00; }
+        .meta { line-height: 1.2; overflow: hidden; }
+
+        /* COMPACT RESOURCES */
+        .res-container { display: flex; flex-wrap: wrap; gap: 2px; }
+        .res-node { 
+            display: flex; align-items: center; 
+            padding: 0 3px; border: 1px solid #444; 
+            background: #111; height: 16px;
+        }
+        .spacer { width: 2px; height: 12px; margin: 0 4px; }
+
+        /* GRID SYSTEM */
+        .grid-header { 
+            background: #00FF00; color: #000; 
+            font-weight: bold; padding: 1px 4px; 
+            font-size: 9px; margin-bottom: 2px;
+        }
+        .unit-grid { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 1px; background: #444; border: 1px solid #444; 
+        }
+
+        /* ARMY UNIT */
+        .unit {
+            width: 46px; height: 46px;
+            background: #000;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            cursor: crosshair;
+        }
+        .unit:hover { background: #111; outline: 1px inset #00FF00; }
+        
+        /* STATIC HEALTH STATE */
+        .h-state { position: absolute; bottom: 1px; left: 1px; right: 1px; height: 3px; }
+        .h-full { background: #00FF00; }
+        .h-dmg  { background: #FFFF00; }
+        .h-crit { background: #FF0000; }
+
+        /* TOOLTIP (RAW) */
+        .unit:hover .tooltip { display: block; }
+        .tooltip {
+            display: none; position: absolute; left: 48px; top: 0;
+            z-index: 100; width: 120px; background: #000;
+            border: 1px solid #00FF00; padding: 4px; color: #00FF00;
+        }
+
+        /* MUSTER (PROGRESS) */
+        .muster-unit { background: #001122; }
+        .p-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: #222; }
+        .p-fill { height: 100%; background: #0088FF; }
+
+        main { 
+            border: 2px solid #555; margin: 4px;
+            display: flex; align-items: center; justify-content: center;
+            background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body>
+
+<aside id="sidebar" class="outset">
+    <!-- TOP LVL INFO -->
+    <div class="profile-block inset">
+        <div class="portrait"></div>
+        <div class="meta">
+            <b>CMD_BRADLEY_J</b><br>
+            RANK: O-5 SUB: 12<br>
+            STATUS: ACTIVE
+        </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="res-container">
+        <div class="res-node">[C]<div class="spacer" style="background:#00FF00"></div>14,000</div>
+        <div class="res-node">[M]<div class="spacer" style="background:#FF00FF"></div>0,820</div>
+        <div class="res-node">[E]<div class="spacer" style="background:#00FFFF"></div>0,012</div>
+    </div>
+
+    <!-- CONTROLLED ARMY -->
+    <div class="inset" style="padding:2px;">
+        <div class="grid-header">UNIT_CORE_ARRAY</div>
+        <div class="unit-grid">
+            <div class="unit">INF
+                <div class="h-state h-full"></div>
+                <div class="tooltip">ID: INF_01<br>STR: 12<br>DEF: 04</div>
+            </div>
+            <div class="unit">INF<div class="h-state h-full"></div></div>
+            <div class="unit">TNK<div class="h-state h-dmg"></div></div>
+            <div class="unit">TNK<div class="h-state h-crit"></div></div>
+            <div class="unit">APC<div class="h-state h-full"></div></div>
+            <!-- Empty Slots -->
+            <div class="unit"></div><div class="unit"></div><div class="unit"></div><div class="unit"></div><div class="unit"></div>
+        </div>
+    </div>
+
+    <!-- MUSTER -->
+    <div class="inset" style="padding:2px;">
+        <div class="grid-header">MUSTER_QUEUE_V2</div>
+        <div class="unit-grid">
+            <div class="unit muster-unit">JET
+                <div class="p-bar"><div class="p-fill" style="width:70%"></div></div>
+            </div>
+            <div class="unit muster-unit">JET
+                <div class="p-bar"><div class="p-fill" style="width:20%"></div></div>
+            </div>
+            <div class="unit muster-unit">
+                <div class="p-bar"><div class="p-fill" style="width:5%"></div></div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<main>
+    [HEX_ENGAGEMENT_ZONE_NULL]
+</main>
+
+</body>
+</html>

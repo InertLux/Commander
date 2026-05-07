@@ -1,0 +1,15 @@
+/* TACTICAL_OS_CORE */
+:root{--grn:#0f0;--bg:#000;--win:#222;--out:#eee #555 #555 #eee;--ins:#555 #eee #eee #555}
+body{background:var(--bg);color:var(--grn);font:11px "Courier New",monospace;display:grid;grid-template-columns:260px 1fr;height:100vh;margin:0}
+.outset{border:2px solid;border-color:var(--out);background:var(--win);padding:4px}
+.inset{border:2px solid;border-color:var(--ins);background:var(--bg);padding:2px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#444}
+.unit{width:46px;height:46px;background:var(--bg);position:relative;display:flex;align-items:center;justify-content:center}
+.tooltip{display:none;pointer-events:none;position:absolute;z-index:9;background:var(--bg);border:1px solid var(--grn);padding:4px;width:120px}
+.unit:hover .tooltip{display:block}
+.res{display:flex;align-items:center;border:1px solid #444;height:16px;padding:0 3px;font-size:9px}
+.spacer{width:2px;height:12px;margin:0 4px;background:var(--grn)}
+.h-bar{position:absolute;bottom:1px;left:1px;right:1px;height:3px}
+.p-bar{position:absolute;bottom:0;width:100%;height:4px;background:#222}
+.p-fill{height:100%;background:#08f}
+here is tthe style.. bare metal.

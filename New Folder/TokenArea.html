@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encampment - Tetris Grid Builder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #d4af37;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #8b6914;
+            padding-bottom: 10px;
+        }
+        
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* TETRIS GRID */
+        .grid-container {
+            background: linear-gradient(135deg, #0f0f0a 0%, #1a1410 100%);
+            border: 3px solid #8b6914;
+            padding: 15px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 0 40px rgba(139,105,20,0.3);
+        }
+        
+        .grid-label {
+            font-size: 9px;
+            color: #8b6914;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(10, 50px);
+            gap: 2px;
+            background: rgba(0,0,0,0.3);
+            padding: 4px;
+            border: 1px solid #3a3a2a;
+        }
+        
+        .cell {
+            background: linear-gradient(135deg, #0f0f0a 0%, #050500 100%);
+            border: 1px solid #2a2a1a;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            color: #3a3a2a;
+        }
+        
+        .cell:hover {
+            background: #1a1410;
+            border-color: #8b6914;
+        }
+        
+        .cell.occupied {
+            background: linear-gradient(135deg, #2a2415 0%, #1a1410 100%);
+            border-color: #8b6914;
+        }
+        
+        .cell.preview {
+            background: rgba(74, 159, 95, 0.3);
+            border-color: #4a9f5f;
+        }
+        
+        /* BUILDING BLOCKS */
+        .building {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: inherit;
+            border: inherit;
+            font-size: 8px;
+            font-weight: bold;
+            color: #d4af37;
+            text-align: center;
+            padding: 2px;
+            position: relative;
+        }
+        
+        .building.size-1x1 { grid-column: span 1; grid-row: span 1; }
+        .building.size-1x2 { grid-column: span 1; grid-row: span 2; }
+        .building.size-2x1 { grid-column: span 2; grid-row: span 1; }
+        .building.size-2x2 { grid-column: span 2; grid-row: span 2; }
+        .building.size-3x2 { grid-column: span 3; grid-row: span 2; }
+        
+        .building-status {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+        }
+        
+        .building-status.producing {
+            background: #4a9f5f;
+            box-shadow: 0 0 3px #4a9f5f;
+        }
+        
+        .building-status.damaged {
+            background: #a05030;
+            box-shadow: 0 0 3px #a05030;
+        }
+        
+        /* SIDEBAR */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .panel {
+            border: 2px solid #8b6914;
+            background: linear-gradient(180deg, #1a1410 0%, #0f0f0a 100%);
+            padding: 12px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 0 20px rgba(139,105,20,0.2);
+        }
+        
+        .panel-title {
+            font-size: 9px;
+            color: #8b6914;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #8b6914;
+            opacity: 0.8;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .stat-label { color: #8b6914; opacity: 0.7; }
+        .stat-value { color: #d4af37; font-weight: bold; }
+        
+        .building-queue {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .queue-item {
+            background: #0f0f0a;
+            border: 1px solid #3a3a2a;
+            padding: 6px;
+            font-size: 9px;
+        }
+        
+        .queue-building {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .queue-size {
+            color: #8b6914;
+            font-size: 8px;
+            margin-bottom: 3px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: #050500;
+            border: 1px solid #2a2a1a;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a9f5f, #6acf7f);
+            width: 65%;
+        }
+        
+        .grid-stats {
+            font-size: 9px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #3a3a2a;
+        }
+        
+        .grid-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        
+        .unit-card {
+            background: #1a1410;
+            border: 1px solid #3a3a2a;
+            padding: 6px;
+            text-align: center;
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .unit-card:hover {
+            border-color: #8b6914;
+            background: #2a2415;
+        }
+        
+        .unit-count {
+            color: #d4af37;
+            font-weight: bold;
+            font-size: 9px;
+        }
+        
+        .unit-name {
+            color: #8b6914;
+            font-size: 7px;
+            margin-top: 2px;
+        }
+        
+        .legend {
+            font-size: 8px;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #3a3a2a;
+        }
+        
+        .legend-item {
+            margin-bottom: 4px;
+            color: #8b6914;
+        }
+        
+        .legend-dot {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">⚔ Encampment - Grid Builder (8x10)</div>
+    
+    <div class="main">
+        <!-- TETRIS GRID -->
+        <div class="grid-container">
+            <div class="grid-label">Build Area: 45/80 Cells Used</div>
+            <div class="grid">
+                <!-- Row 1 -->
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-2x2">Tower<div class="building-status producing"></div></div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-1x2">Shrine<div class="building-status producing"></div></div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 2 -->
+                <div class="cell"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-2x2">Barracks<div class="building-status producing"></div></div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 3 -->
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-3x2">Great Hall</div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 4 -->
+                <div class="cell"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 5 -->
+                <div class="cell occupied">
+                    <div class="building size-1x1">Smithy<div class="building-status producing"></div></div>
+                </div>
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-2x1">Granary<div class="building-status damaged"></div></div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-1x2">Stable<div class="building-status producing"></div></div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 6 -->
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied">
+                    <div class="building size-2x1">Workshop</div>
+                </div>
+                <div class="cell"></div>
+                
+                <!-- Row 7 -->
+                <div class="cell occupied">
+                    <div class="building size-2x2">Armory</div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-1x2">Watch<br>tower<div class="building-status"></div></div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 8 -->
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied">
+                    <div class="building size-2x1">Observatory</div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 9 -->
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-2x2">Barracks<div class="building-status"></div></div>
+                </div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-1x1">Tower<div class="building-status"></div></div>
+                </div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                
+                <!-- Row 10 -->
+                <div class="cell"></div>
+                <div class="cell occupied"></div>
+                <div class="cell occupied"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell occupied">
+                    <div class="building size-1x1">Tower</div>
+                </div>
+            </div>
+            
+            <div class="grid-stats">
+                <div class="grid-stat">
+                    <span class="stat-label">Space Used:</span>
+                    <span class="stat-value">45/80</span>
+                </div>
+                <div class="grid-stat">
+                    <span class="stat-label">Efficiency:</span>
+                    <span class="stat-value">56%</span>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot" style="background: #4a9f5f;"></span>Producing</div>
+                    <div class="legend-item"><span class="legend-dot" style="background: #a05030;"></span>Damaged</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="panel">
+                <div class="panel-title">Resources</div>
+                <div class="stat-row">
+                    <span class="stat-label">Gold</span>
+                    <span class="stat-value">1,240</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Wood</span>
+                    <span class="stat-value">3,850</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Stone</span>
+                    <span class="stat-value">2,100</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Food</span>
+                    <span class="stat-value">4,500</span>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">Build Queue</div>
+                <div class="building-queue">
+                    <div class="queue-item">
+                        <div class="queue-building">Tower (2x2)</div>
+                        <div class="queue-size">4 cells</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 72%;"></div>
+                        </div>
+                    </div>
+                    <div class="queue-item">
+                        <div class="queue-building">Barracks (2x2)</div>
+                        <div class="queue-size">4 cells

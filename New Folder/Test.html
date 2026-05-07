@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Avatar Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .title {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .title p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Avatar Display Section */
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .avatar-display {
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(135deg, #e0f7ff 0%, #fff9e6 100%);
+            border: 4px solid #333;
+            border-radius: 10px;
+            position: relative;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .avatar-canvas {
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-export {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-reset {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-copy {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #0b7dda;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Controls Section */
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        input[type="color"]:hover {
+            border-color: #667eea;
+        }
+
+        input[type="color"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .color-value {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            min-width: 70px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 10px 0;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-switches {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 28px;
+            background: #ccc;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #4CAF50;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 24px;
+        }
+
+        .randomize-btn {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .randomize-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .randomize-btn:active {
+            transform: translateY(0);
+        }
+
+        /* JSON Display */
+        .json-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .json-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .json-code {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #333;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 120px;
+            overflow-y: auto;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 30px;
+            }
+
+            .title h1 {
+                font-size: 24px;
+            }
+
+            .avatar-display {
+                width: 250px;
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="title">
+            <h1>🎨 Pixel Avatar Creator</h1>
+            <p>Design your unique pixel art character</p>
+        </div>
+
+        <!-- Avatar Display -->
+        <div class="avatar-section">
+            <div class="avatar-display">
+                <canvas id="avatarCanvas" class="avatar-canvas"></canvas>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-export" onclick="exportAvatar()">📥 Export PNG</button>
+                <button class="btn btn-copy" onclick="copyToClipboard()">📋 Copy JSON</button>
+                <button class="btn btn-reset" onclick="resetAvatar()">🔄 Reset</button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-section">
+            <!-- Head Section -->
+            <div>
+                <div class="section-title">Head</div>
+                <div class="control-group">
+                    <label class="control-label">Shape</label>
+                    <select id="headShape" onchange="updateAvatar()">
+                        <option value="round">Round</option>
+                        <option value="square">Square</option>
+                        <option value="oval">Oval</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Skin Tone</label>
+                    <div class="control-row">
+                        <input type="color" id="skinColor" value="#F4A460" onchange="updateAvatar()">
+                        <span class="color-value" id="skinColorValue">#F4A460</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Hair Section -->
+            <div>
+                <div class="section-title">Hair</div>
+                <div class="control-group">
+                    <label class="control-label">Style</label>
+                    <select id="hairStyle" onchange="updateAvatar()">
+                        <option value="short">Short</option>
+                        <option value="long">Long</option>
+                        <option value="curly">Curly</option>
+                        <option value="mohawk">Mohawk</option>
+                        <option value="bald">Bald</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Hair Color</label>
+                    <div class="control-row">
+                        <input type="color" id="hairColor" value="#8B4513" onchange="updateAvatar()">
+                        <span class="color-value" id="hairColorValue">#8B4513</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Eyes Section -->
+            <div>
+                <div class="section-title">Eyes</div>
+                <div class="control-group">
+                    <label class="control-label">Type</label>
+                    <select id="eyeType" onchange="updateAvatar()">
+                        <option value="normal">Normal</option>
+                        <option value="happy">Happy</option>
+                        <option value="closed">Closed</option>
+                        <option value="shocked">Shocked</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Eye Color</label>
+                    <div class="control-row">
+                        <input type="color" id="eyeColor" value="#000000" onchange="updateAvatar()">
+                        <span class="color-value" id="eyeColorValue">#000000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Body Section -->
+            <div>
+                <div class="section-title">Body</div>
+                <div class="control-group">
+                    <label class="control-label">Outfit</label>
+                    <select id="outfitType" onchange="updateAvatar()">
+                        <option value="tshirt">T-Shirt</option>
+                        <option value="sweater">Sweater</option>
+                        <option value="hoodie">Hoodie</option>
+                        <option value="suit">Suit</option>
+                        <option value="dress">Dress</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Outfit Color</label>
+                    <div class="control-row">
+                        <input type="color" id="outfitColor" value="#FF6B6B" onchange="updateAvatar()">
+                        <span class="color-value" id="outfitColorValue">#FF6B6B</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Accessories Section -->
+            <div>
+                <div class="section-title">Accessories</div>
+                <div class="toggle-switches">
+                    <div class="toggle-item">
+                        <label class="toggle-label">Glasses</label>
+                        <div class="toggle-switch" id="hasGlasses" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-item">
+                        <label class="toggle-label">Hat</label>
+                        <div class="toggle-switch" id="hasHat" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-item">
+                        <label class="toggle-label">Facial Hair</label>
+                        <div class="toggle-switch" id="hasFacialHair" onclick="toggleSwitch(this)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Pants Section -->
+            <div>
+                <div class="section-title">Legs</div>
+                <div class="control-group">
+                    <label class="control-label">Pants Color</label>
+                    <div class="control-row">
+                        <input type="color" id="pantsColor" value="#1F1F1F" onchange="updateAvatar()">
+                        <span class="color-value" id="pantsColorValue">#1F1F1F</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Randomize Button -->
+            <button class="randomize-btn" onclick="randomizeAvatar()">🎲 Randomize</button>
+
+            <!-- JSON Display -->
+            <div class="json-section">
+                <div class="json-title">Avatar JSON Data</div>
+                <div class="json-code" id="jsonOutput"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Avatar configuration object
+        const avatarConfig = {
+            headShape: 'round',
+            skinColor: '#F4A460',
+            hairStyle: 'short',
+            hairColor: '#8B4513',
+            eyeType: 'normal',
+            eyeColor: '#000000',
+            outfitType: 'tshirt',
+            outfitColor: '#FF6B6B',
+            pantsColor: '#1F1F1F',
+            hasGlasses: false,
+            hasHat: false,
+            hasFacialHair: false
+        };
+
+        // Color options for randomization
+        const colorOptions = {
+            skin: ['#F4A460', '#D4A373', '#E8BF86', '#C89968', '#F0C080'],
+            hair: ['#8B4513', '#FFD700', '#FF6347', '#4B0082', '#2F4F4F', '#DC143C'],
+            eyes: ['#000000', '#4169E1', '#228B22', '#FF6347', '#8B4513'],
+            outfit: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#6C5B7B', '#FF69B4'],
+            pants: ['#1F1F1F', '#2F4F4F', '#8B4513', '#1C1C1C']
+        };
+
+        const headShapes = ['round', 'square', 'oval'];
+        const hairStyles = ['short', 'long', 'curly', 'mohawk', 'bald'];
+        const eyeTypes = ['normal', 'happy', 'closed', 'shocked'];
+        const outfitTypes = ['tshirt', 'sweater', 'hoodie', 'suit', 'dress'];
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateAvatar();
+            loadFromLocalStorage();
+        });
+
+        // Update avatar display
+        function updateAvatar() {
+            // Update config from form
+            avatarConfig.headShape = document.getElementById('headShape').value;
+            avatarConfig.skinColor = document.getElementById('skinColor').value;
+            avatarConfig.hairStyle = document.getElementById('hairStyle').value;
+            avatarConfig.hairColor = document.getElementById('hairColor').value;
+            avatarConfig.eyeType = document.getElementById('eyeType').value;
+            avatarConfig.eyeColor = document.getElementById('eyeColor').value;
+            avatarConfig.outfitType = document.getElementById('outfitType').value;
+            avatarConfig.outfitColor = document.getElementById('outfitColor').value;
+            avatarConfig.pantsColor = document.getElementById('pantsColor').value;
+            avatarConfig.hasGlasses = document.getElementById('hasGlasses').classList.contains('active');
+            avatarConfig.hasHat = document.getElementById('hasHat').classList.contains('active');
+            avatarConfig.hasFacialHair = document.getElementById('hasFacialHair').classList.contains('active');
+
+            // Update color value displays
+            document.getElementById('skinColorValue').textContent = avatarConfig.skinColor;
+            document.getElementById('hairColorValue').textContent = avatarConfig.hairColor;
+            document.getElementById('eyeColorValue').textContent = avatarConfig.eyeColor;
+            document.getElementById('outfitColorValue').textContent = avatarConfig.outfitColor;
+            document.getElementById('pantsColorValue').textContent = avatarConfig.pantsColor;
+
+            // Render avatar
+            renderAvatar();
+
+            // Update JSON display
+            updateJsonDisplay();
+
+            // Save to localStorage
+            saveToLocalStorage();
+        }
+
+        // Draw avatar on canvas
+        function renderAvatar() {
+            const canvas = document.getElementById('avatarCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            canvas.width = 300;
+            canvas.height = 400;
+
+            // Clear canvas
+            ctx.fillStyle = 'transparent';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw in order: body, legs, arms, head, hair, eyes, accessories
+
+            // Draw legs
+            ctx.fillStyle = avatarConfig.pantsColor;
+            ctx.fillRect(100, 240, 25, 100);
+            ctx.fillRect(175, 240, 25, 100);
+
+            // Draw shoes
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(95, 335, 35, 15);
+            ctx.fillRect(170, 335, 35, 15);
+
+            // Draw body/outfit
+            ctx.fillStyle = avatarConfig.outfitColor;
+            if (avatarConfig.outfitType === 'tshirt') {
+                ctx.fillRect(85, 150, 130, 100);
+                ctx.fillStyle = avatarConfig.skinColor;
+                ctx.fillRect(60, 160, 25, 80);
+                ctx.fillRect(215, 160, 25, 80);
+            } else if (avatarConfig.outfitType === 'sweater') {
+                ctx.fillRect(80, 150, 140, 100);
+                ctx.fillStyle = avatarConfig.skinColor;
+                ctx.fillRect(60, 175, 20, 60);
+                ctx.fillRect(220, 175, 20, 60);
+            } else if (avatarConfig.outfitType === 'hoodie') {
+                ctx.fillRect(75, 140, 150, 110);
+                ctx.fillStyle = avatarConfig.skinColor;
+                ctx.fillRect(60, 180, 20, 50);
+                ctx.fillRect(220, 180, 20, 50);
+            } else if (avatarConfig.outfitType === 'suit') {
+                ctx.fillRect(85, 150, 130, 100);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(75, 240, 150, 40);
+                ctx.fillStyle = avatarConfig.skinColor;
+                ctx.fillRect(60, 160, 25, 75);
+                ctx.fillRect(215, 160, 25, 75);
+            } else if (avatarConfig.outfitType === 'dress') {
+                ctx.beginPath();
+                ctx.moveTo(85, 150);
+                ctx.lineTo(215, 150);
+                ctx.lineTo(225, 250);
+                ctx.lineTo(75, 250);
+                ctx.fill();
+                ctx.fillStyle = avatarConfig.skinColor;
+                ctx.fillRect(60, 155, 25, 85);
+                ctx.fillRect(215, 155, 25, 85);
+            }
+
+            // Draw head
+            ctx.fillStyle = avatarConfig.skinColor;
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+
+            if (avatarConfig.headShape === 'round') {
+                ctx.beginPath();
+                ctx.arc(150, 100, 50, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            } else if (avatarConfig.headShape === 'square') {
+                ctx.fillRect(100, 50, 100, 100);
+                ctx.strokeRect(100, 50, 100, 100);
+            } else if (avatarConfig.headShape === 'oval') {
+                ctx.beginPath();
+                ctx.ellipse(150, 100, 45, 55, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // Draw hair
+            if (avatarConfig.hairStyle !== 'bald') {
+                ctx.fillStyle = avatarConfig.hairColor;
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+
+                if (avatarConfig.hairStyle === 'short') {
+                    ctx.fillRect(95, 45, 110, 35);
+                    ctx.strokeRect(95, 45, 110, 35);
+                } else if (avatarConfig.hairStyle === 'long') {
+                    ctx.beginPath();
+                    ctx.moveTo(100, 50);
+                    ctx.quadraticCurveTo(75, 120, 90, 180);
+                    ctx.lineTo(210, 180);
+                    ctx.quadraticCurveTo(225, 120, 200, 50);
+                    ctx.lineTo(100, 50);
+                    ctx.fill();
+                    ctx.stroke();
+                } else if (avatarConfig.hairStyle === 'curly') {
+                    for (let x = 95; x < 205; x += 20) {
+                        ctx.beginPath();
+                        ctx.arc(x, 40, 12, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                } else if (avatarConfig.hairStyle === 'mohawk') {
+                    ctx.beginPath();
+                    ctx.moveTo(150, 30);
+                    ctx.lineTo(140, 60);
+                    ctx.lineTo(145, 75);
+                    ctx.lineTo(150, 50);
+                    ctx.lineTo(155, 75);
+                    ctx.lineTo(160, 60);
+                    ctx.lineTo(150, 30);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
+
+            // Draw eyes
+            ctx.fillStyle = avatarConfig.eyeColor;
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+
+            if (avatarConfig.eyeType === 'normal') {
+                ctx.beginPath();
+                ctx.arc(130, 90, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(170, 90, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                // Pupils
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(132, 88, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(172, 88, 3, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (avatarConfig.eyeType === 'happy') {
+                ctx.fillRect(125, 85, 10, 10);
+                ctx.fillRect(165, 85, 10, 10);
+                ctx.strokeRect(125, 85, 10, 10);
+                ctx.strokeRect(165, 85, 10, 10);
+            } else if (avatarConfig.eyeType === 'closed') {
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(130, 90, 8, 0, Math.PI);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(170, 90, 8, 0, Math.PI);
+                ctx.stroke();
+            } else if (avatarConfig.eyeType === 'shocked') {
+                ctx.beginPath();
+                ctx.arc(130, 90, 10, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(170, 90, 10, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(130, 90, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(170, 90, 5, 0, Math.PI * 2);

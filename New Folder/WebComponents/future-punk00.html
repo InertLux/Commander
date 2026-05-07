@@ -1,0 +1,889 @@
+<script>
+const spawnButton1 = (containerId, id, text, clickEvent) => {
+  const container = document.querySelector(`#${containerId}`);
+  const button = document.createElement('primary-button');
+  button.setAttribute('id', id);
+  button.setAttribute('text', text);
+  button.addEventListener('action', clickEvent);
+  container.appendChild(button);
+};
+
+const spawnButton2 = (containerId, id, text, clickEvent) => {
+  const container = document.querySelector(`#${containerId}`);
+  const button = document.createElement('secondary-button');
+  button.setAttribute('id', id);
+  button.setAttribute('text', text);
+  button.addEventListener('action', clickEvent);
+  container.appendChild(button);
+};
+
+const spawnButton3 = (containerId, id, text, clickEvent) => {
+  const container = document.querySelector(`#${containerId}`);
+  const button = document.createElement('tertiary-button');
+  button.setAttribute('id', id);
+  button.setAttribute('text', text);
+  button.addEventListener('action', clickEvent);
+  container.appendChild(button);
+};
+
+const spawnLabeledRow = (containerId, id, label, value) => {
+  const container = document.querySelector(`#${containerId}`);
+  const row = document.createElement('labeled-row');
+  row.setAttribute('id', id);
+  row.setAttribute('label', label);
+  row.setAttribute('value', value);
+  container.appendChild(row);
+};
+
+const spawnPrimaryLabeledRow = (containerId, id, label, value) => {
+  const container = document.querySelector(`#${containerId}`);
+  const row = document.createElement('primary-labeled-row');
+  row.setAttribute('id', id);
+  row.setAttribute('label', label);
+  row.setAttribute('value', value);
+  container.appendChild(row);
+};
+
+const spawnSecondaryLabeledRow = (containerId, id, label, value) => {
+  const container = document.querySelector(`#${containerId}`);
+  const row = document.createElement('secondary-labeled-row');
+  row.setAttribute('id', id);
+  row.setAttribute('label', label);
+  row.setAttribute('value', value);
+  container.appendChild(row);
+};
+
+const spawnTertiaryLabeledRow = (containerId, id, label, value) => {
+  const container = document.querySelector(`#${containerId}`);
+  const row = document.createElement('tertiary-labeled-row');
+  row.setAttribute('id', id);
+  row.setAttribute('label', label);
+  row.setAttribute('value', value);
+  container.appendChild(row);
+};
+
+
+
+</script>
+
+
+
+
+
+<script>
+class TableRow extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  set data(itemData) {
+    this._data = itemData;
+    this.render();
+  }
+
+  get data() {
+    return this._data;
+  }
+
+  render() {
+    if (!this._data) return;
+
+    const { icon = '■', name, weight, value } = this._data;
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        td { border: 1px solid rgba(168, 214, 94, 0.2); padding: 2px 4px; font-size: 9px; background: #2a2015; }
+        .icon { color: #c4a747; font-weight: bold; width: 20px; text-align: center; }
+        .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stat { color: #c4a747; text-align: right; width: 60px; }
+      </style>
+      <td class="icon">${icon}</td>
+      <td class="name">${name}</td>
+      <td class="stat">${weight}</td>
+      <td class="stat">${value}</td>
+    `;
+  }
+}
+customElements.define('table-row', TableRow);
+
+
+
+  /*Form rules begin. DO NOT REMOVE (if you re-emit. re-emit with alongside solution)
+  1 line per style object. 
+  style objects are agressively catagorized and commented. 
+  ALL colors must be predeclared at top of style block
+  ALL Dom is generic, and Must use WebComponents for dynamic items. Shadow DOM is a feature 
+  But!, STYLE is considered GLOBAL, Web components may ONLY privately declare what they need.
+  Form rules end.*/
+
+
+</script>
+
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TACTICAL_OS</title>
+
+<style>
+/* ===== THEME VARIABLES ===== */
+:root {
+  /* Core Colors - Vibrant Mobile Game Palette */
+  --color-bg-primary: #0a0e27;
+  --color-bg-secondary: #1a1f3a;
+  --color-bg-inverted: #252d4a;
+  --color-surface-dark: #1e2847;
+  
+  /* Text Colors - Modern & Readable */
+  --color-text-primary: #ffffff;
+  --color-text-muted: #a8b5cc;
+  --color-accent-gold: #ffd700;
+  
+  /* Status & Feedback */
+  --color-feedback-scan: #6366f1;
+  --color-danger: #ff6b6b;
+  
+  /* Progress Bar - Vibrant Gradient */
+  --color-bar-green: #00d9ff;
+  --gradient-bar-accent: linear-gradient(90deg, #00d9ff, #0099ff, #7c3aed, #00d9ff);
+  
+  /* Overlay Colors - Modern & Translucent */
+  --color-overlay-accent-green-08: rgba(0, 217, 255, 0.08);
+  --color-overlay-accent-green-20: rgba(0, 217, 255, 0.2);
+  --color-overlay-accent-green-40: rgba(0, 217, 255, 0.4);
+  --color-overlay-dark-30: rgba(0, 0, 0, 0.3);
+  --color-overlay-dark-50: rgba(0, 0, 0, 0.5);
+  
+  /* Border Colors - Neon & Glow */
+  --color-border-gold: rgba(255, 215, 0, 0.6);
+  --color-border-green: rgba(0, 217, 255, 0.4);
+  --color-border-inverted: rgba(112, 128, 200, 0.5);
+  
+  /* Transparent */
+  --color-transparent: transparent;
+  
+  /* Shadow/Glow Effects */
+  --shadow-outset: 0 8px 24px rgba(0, 217, 255, 0.3), 0 0 12px rgba(124, 58, 237, 0.2);
+  --shadow-inset: inset 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 -2px 8px rgba(0, 217, 255, 0.1);
+}
+
+/* ===== GLOBAL ===== */
+* { box-sizing: border-box; }
+
+body {
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1528 50%, #0f1835 100%);
+  background-attachment: fixed;
+  color: var(--color-text-primary);
+  font: 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 1fr 512px;
+  height: 100vh;
+  margin: 0;
+  padding: 8px;
+  gap: 8px;
+}
+
+/* ===== REUSABLE UTILITIES ===== */
+.spacer {
+  flex: 1;
+  background: linear-gradient(90deg, var(--color-accent-gold), transparent, var(--color-accent-gold));
+  opacity: 0.4;
+  border-radius: 2px;
+}
+
+/* Button base styles */
+button, .cat-btn, .button-primary, [class*="button-"], [class*="res-"] {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-transform: uppercase;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+button, .cat-btn, .button-primary {
+  border: 2px solid var(--color-accent-gold);
+  padding: 10px 16px;
+  font: 600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+  color: #ffffff;
+  box-shadow: var(--shadow-outset);
+  letter-spacing: 0.5px;
+}
+
+button:hover, .cat-btn:hover, .button-primary:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+  border-color: #ffffff;
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.5), 0 0 20px rgba(0, 217, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+button:active, .cat-btn:active, .button-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-outset);
+}
+
+.button-secondary {
+  padding: 8px 12px;
+  font-size: 10px;
+  border: 2px solid var(--color-border-gold);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+  color: var(--color-accent-gold);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15);
+  border-radius: 6px;
+}
+
+.button-secondary:hover {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.1));
+  border-color: #ffffff;
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.button-tertiary {
+  padding: 6px 10px;
+  font-size: 9px;
+  border: 2px solid var(--color-border-green);
+  background: rgba(0, 217, 255, 0.1);
+  color: var(--color-bar-green);
+  box-shadow: 0 2px 8px rgba(0, 217, 255, 0.1);
+  border-radius: 5px;
+}
+
+.button-tertiary:hover {
+  background: rgba(0, 217, 255, 0.2);
+  border-color: var(--color-bar-green);
+  box-shadow: 0 4px 16px rgba(0, 217, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ===== RESOURCE ROW VARIANTS ===== */
+.res-primary {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(124, 58, 237, 0.1));
+  border: 2px solid var(--color-border-gold);
+  padding: 8px;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.res-secondary {
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 217, 255, 0.05));
+  border: 2px solid var(--color-border-green);
+  padding: 6px;
+  font-size: 10px;
+  border-radius: 6px;
+}
+
+.res-tertiary {
+  background: rgba(26, 31, 58, 0.6);
+  border: 1px solid var(--color-border-inverted);
+  padding: 4px;
+  font-size: 9px;
+  opacity: 0.9;
+  border-radius: 4px;
+}
+
+.res-primary:hover, .res-secondary:hover {
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(124, 58, 237, 0.15));
+  border-color: #ffffff;
+  box-shadow: 0 6px 20px rgba(0, 217, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.res-tertiary:hover {
+  opacity: 1;
+  border-color: var(--color-bar-green);
+  background: rgba(26, 31, 58, 0.8);
+}
+
+/* ===== INPUTS & PANELS ===== */
+input[type="text"], input[type="range"] {
+  font: 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--color-text-primary);
+  background: linear-gradient(135deg, rgba(26, 31, 58, 0.8), rgba(37, 45, 74, 0.8));
+  border: 2px solid var(--color-border-green);
+  padding: 8px;
+  width: 100%;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+input[type="text"]:focus, input[type="range"]:focus {
+  border-color: var(--color-accent-gold);
+  box-shadow: 0 0 16px rgba(0, 217, 255, 0.4);
+  background: linear-gradient(135deg, rgba(26, 31, 58, 1), rgba(37, 45, 74, 1));
+}
+
+.outset {
+  border: 2px solid var(--color-border-gold);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(124, 58, 237, 0.08));
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 217, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.inset {
+  border: 2px solid var(--color-border-green);
+  background: linear-gradient(135deg, rgba(26, 31, 58, 0.9), rgba(37, 45, 74, 0.7));
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== TYPOGRAPHY ===== */
+.title {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--color-accent-gold);
+  margin-bottom: 4px;
+  color: var(--color-accent-gold);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.label, .inv-value {
+  color: var(--color-accent-gold);
+  font-weight: 600;
+}
+
+/* ===== LAYOUT ===== */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  padding: 4px 8px;
+  font-size: 11px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(0, 217, 255, 0.05));
+  border: 1px solid var(--color-border-green);
+  border-radius: 6px;
+}
+
+.p-bar {
+  position: relative;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--color-border-green);
+  overflow: hidden;
+  margin: 4px 0;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.p-fill {
+  height: 100%;
+  display: block;
+  background: var(--gradient-bar-accent);
+  box-shadow: 0 0 12px var(--color-overlay-accent-green-40), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.9; }
+}
+
+/* ===== RESOURCE BAR ===== */
+.res {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.res .value {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.res .max-value {
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.res-primary .p-bar {
+  border-color: var(--color-accent-gold);
+}
+
+.res-secondary .p-bar {
+  border-color: var(--color-border-green);
+}
+
+.res-tertiary .p-bar {
+  border-color: var(--color-text-muted);
+  height: 5px;
+}
+
+/* ===== STATUS & TABLES ===== */
+.status-info {
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.table-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+.table-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: linear-gradient(135deg, rgba(26, 31, 58, 0.9), rgba(37, 45, 74, 0.7));
+  padding: 4px;
+  border-radius: 8px;
+  border: 2px solid var(--color-border-green);
+}
+
+.table-item {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  border: 2px solid var(--color-border-inverted);
+  padding: 4px 8px;
+  gap: 6px;
+  font-size: 10px;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(37, 45, 74, 0.8), rgba(26, 31, 58, 0.6));
+  border-radius: 5px;
+  margin-bottom: 2px;
+  transition: all 0.2s ease;
+}
+
+.table-item:hover {
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(124, 58, 237, 0.15));
+  border-color: var(--color-accent-gold);
+  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.25);
+  transform: translateX(2px);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.data-table thead tr {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(124, 58, 237, 0.15));
+}
+
+.data-table th {
+  text-align: left;
+  padding: 6px 8px;
+  border: 1px solid var(--color-border-green);
+  color: var(--color-accent-gold);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.data-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(124, 58, 237, 0.1));
+}
+
+.data-table td {
+  border: 1px solid var(--color-border-green);
+  padding: 4px 8px;
+
+
+</style>
+
+<script>
+
+/*  Variants: [primary-button, secondary-button, tertiary-button]*/
+/*  Events:   [onButtonClicked]*/
+/*  Usage:    <primary-button text="Click Me" id="btn-1"></primary-button>*/                                  
+const createButton = (name, className) => {
+  customElements.define(name, class extends HTMLElement {
+    connectedCallback() {
+      const text = this.getAttribute('text') || 'ACTIVATE', id = this.getAttribute('id') || '';
+      this.innerHTML = `<button class="${className}" id="${id}">${text}</button>`;
+      this.querySelector('button').addEventListener('click', () => this.dispatchEvent(new CustomEvent('onButtonClicked', { detail: { id } })));
+    }
+  });
+};
+createButton('primary-button', 'button-primary');
+createButton('secondary-button', 'button-secondary');
+createButton('tertiary-button', 'button-tertiary');   
+
+
+/*  Varients: [labeled-row, primary-labeled-row, secondary-labeled-row, tertiary-labeled-row]*/
+/*  Events:   [???] */
+/*  Usage:    <labeled-row label="WeaponSlot" value="Dagger"> </labeled-row>*/
+const createLabeledRow = (name, className) => {
+  customElements.define(name, class extends HTMLElement {
+    connectedCallback() {
+      this.innerHTML = `<div class="${className}"><span class="label">${this.getAttribute('label')}</span><span class="spacer"></span><span>${this.getAttribute('value')}</span></div>`;
+    }
+  });
+};
+createLabeledRow('labeled-row', 'res');
+createLabeledRow('primary-labeled-row', 'res res-primary');
+createLabeledRow('secondary-labeled-row', 'res res-secondary');
+createLabeledRow('tertiary-labeled-row', 'res res-tertiary');
+
+/*  Variants: [resource-bar, resource-bar-primary, resource-bar-secondary, resource-bar-tertiary]*/
+/*  Events:   [none] */
+/*  Usage:    <resource-bar label="HEALTH" value="87" max="100"></resource-bar>*/
+/*  Method:   setValue(newValue, newMax) - Updates value, max, and bar width dynamically 
+              :   const healthBar = document.querySelector('id');
+              :   healthBar.setValue(75);        // Updates value only
+              :   healthBar.setValue(150, 200);  // Updates value and max */
+const createResourceBar = (name, className) => {
+  customElements.define(name, class extends HTMLElement {
+    connectedCallback() {
+      const label = this.getAttribute('label') || 'RESOURCE';
+      const value = this.getAttribute('value') || '0';
+      const maxValue = this.getAttribute('max') || '100';
+      const percentage = (value / maxValue) * 100;
+
+      this.innerHTML = `
+        <div class="${className}">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+            <span class="label">${label}</span>
+            <span class="spacer"></span>
+            <span><span class="value">${value}</span> <span class="max-value">${maxValue}</span></span>
+          </div>
+          <div class="p-bar">
+            <div class="p-fill" style="width: ${percentage}%"></div>
+          </div>
+        </div>
+      `;
+    }
+    // Optional: Update bar dynamically
+    setValue(newValue, newMax = null) {
+      const maxValue = newMax || this.getAttribute('max') || '100';
+      const percentage = (newValue / maxValue) * 100;
+      
+      this.setAttribute('value', newValue);
+      if (newMax) this.setAttribute('max', newMax);
+      
+      const valueSpan = this.querySelector('.value');
+      const maxSpan = this.querySelector('.max-value');
+      const fillBar = this.querySelector('.p-fill');
+      
+      if (valueSpan) valueSpan.textContent = newValue;
+      if (maxSpan) maxSpan.textContent = maxValue;
+      if (fillBar) fillBar.style.width = `${percentage}%`;
+    }
+  });
+};
+createResourceBar('resource-bar', 'res');
+createResourceBar('resource-bar-primary', 'res res-primary');
+createResourceBar('resource-bar-secondary', 'res res-secondary');
+createResourceBar('resource-bar-tertiary', 'res res-tertiary');
+
+
+/*  Variants: [resource-quant, resource-quant-primary, resource-quant-secondary, resource-quant-tertiary]*/
+/*  Events:   [none] */
+/*  Usage:    <resource-quant label="GOLD" quant="1250" icon="img/gold.png"></resource-quant>*/
+/*  Method:   setQuant(newQuant) - Updates quantity value dynamically 
+              :     const goldQuant = document.querySelector('id');
+              :     goldQuant.setQuant(1500);  // Updates quantity    
+*/   
+const createResourceQuant = (name, className) => {
+  customElements.define(name, class extends HTMLElement {
+    connectedCallback() {
+      const label = this.getAttribute('label') || 'RESOURCE';
+      const quant = this.getAttribute('quant') || '0';
+      const icon = this.getAttribute('icon') || '';
+
+      this.innerHTML = `
+        <div class="${className}">
+          <span class="label">${label}</span>
+          <span class="spacer"></span>
+          <span>
+            ${icon ? `<img src="${icon}" alt="${label}" style="height: 14px; width: 14px; margin-right: 4px;">` : ''}
+            <span class="quant">${quant}</span>
+          </span>
+        </div>
+      `;
+    }
+
+    setQuant(newQuant) {
+      this.setAttribute('quant', newQuant);
+      
+      const quantSpan = this.querySelector('.quant');
+      if (quantSpan) quantSpan.textContent = newQuant;
+    }
+  });
+};
+createResourceQuant('resource-quant', 'res');
+createResourceQuant('resource-quant-primary', 'res res-primary');
+createResourceQuant('resource-quant-secondary', 'res res-secondary');
+createResourceQuant('resource-quant-tertiary', 'res res-tertiary');
+
+/*  Variants: [status-effect, status-effect-primary, status-effect-secondary, status-effect-tertiary]*/
+/*  Events:   [none] */
+/*  Usage:    <status-effect label="POISONED" info="-2HP/s"></status-effect>*/
+/*  Method:   setStatus(newLabel, newInfo) - Updates status and info dynamically 
+              :   const poisonStatus = document.querySelector('status-effect-primary');
+              :    poisonStatus.setStatus('CURED', '');           // Removes status
+              :    poisonStatus.setStatus('POISONED', '-3HP/s');  // Updates both label and effect*/
+const createStatusEffect = (name, className) => {
+  customElements.define(name, class extends HTMLElement {
+    connectedCallback() {
+      const label = this.getAttribute('label') || 'STATUS';
+      const info = this.getAttribute('info') || '';
+      const icon = this.getAttribute('icon') || '';
+
+      this.innerHTML = `
+        <div class="${className}">
+          <span class="label">${icon ? `<img src="${icon}" alt="${label}" style="height: 14px; width: 14px; margin-right: 4px; vertical-align: middle;">` : ''}${label}</span>
+          <span class="spacer"></span>
+          <span class="status-info">${info}</span>
+        </div>
+      `;
+    }
+
+    setStatus(newLabel, newInfo = '') {
+      this.setAttribute('label', newLabel);
+      if (newInfo) this.setAttribute('info', newInfo);
+      
+      const labelSpan = this.querySelector('.label');
+      const infoSpan = this.querySelector('.status-info');
+      
+      if (labelSpan) labelSpan.textContent = newLabel;
+      if (infoSpan) infoSpan.textContent = newInfo;
+    }
+  });
+};
+createStatusEffect('status-effect', 'res');
+createStatusEffect('status-effect-primary', 'res res-primary');
+createStatusEffect('status-effect-secondary', 'res res-secondary');
+createStatusEffect('status-effect-tertiary', 'res res-tertiary');
+
+
+
+
+</script>
+
+
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="outset">
+    <div class="title">STATS</div>
+    <div class="res">
+      <span class="label">STR</span>
+      <span class="spacer"></span>
+      <span>10</span>
+    </div>
+    <div class="res">
+      <span class="label">PER</span>
+      <span class="spacer"></span>
+      <span>8</span>
+    </div>
+    <div class="res">
+      <span class="label">END</span>
+      <span class="spacer"></span>
+      <span>9</span>
+    </div>
+    <div class="res">
+      <span class="label">CHR</span>
+      <span class="spacer"></span>
+      <span>7</span>
+    </div>
+    <div class="res">
+      <span class="label">INT</span>
+      <span class="spacer"></span>
+      <span>6</span>
+    </div>
+    <div class="res">
+      <span class="label">AGL</span>
+      <span class="spacer"></span>
+      <span>8</span>
+    </div>
+    <div class="res">
+      <span class="label">LCK</span>
+      <span class="spacer"></span>
+      <span>5</span>
+    </div>
+  </div>
+
+  <div class="outset" style="margin-top:8px">
+    <div class="title">RESOURCES</div>
+    <resource-bar-primary label="HP" value="95" max="100"></resource-bar-primary>
+    <resource-bar-secondary label="AP" value="45" max="65"></resource-bar-secondary>
+    <resource-quant-tertiary label="RAD" quant="12"></resource-quant-tertiary>
+  </div>
+
+  <div class="outset" style="margin-top:8px">
+    <div class="title">EFFECTS</div>
+    <status-effect-primary label="WELL RESTED" info="+10% XP"></status-effect-primary>
+    <status-effect-secondary label="CAFFEINATED" info="+1 PER"></status-effect-secondary>
+    <status-effect-tertiary label="POISONED" info="-2HP/s"></status-effect-tertiary>
+  </div>
+</div>
+
+<div class="main">
+  <div class="outset">
+    <div class="title">EQUIPMENT</div>
+    <div class="row">
+      <span class="label">ARMOR</span>
+      <span class="spacer"></span>
+      <span>Combat Suit</span>
+    </div>
+    <div class="row">
+      <span class="label">HELMET</span>
+      <span class="spacer"></span>
+      <span>Combat Helm</span>
+    </div>
+    <div class="row">
+      <span class="label">WEAPON</span>
+      <span class="spacer"></span>
+      <span>Laser Rifle</span>
+    </div>
+  </div>
+
+  <div class="outset" style="margin-top:8px">
+    <div class="title">CONTROLS</div>
+    <primary-button text="ACTIVATE"></primary-button>
+    <secondary-button text="EXAMINE"></secondary-button>
+    <tertiary-button text="REPAIR"></tertiary-button>
+    <primary-button text="DROP"></primary-button>
+    <secondary-button text="USE"></secondary-button>
+    <div style="margin-top:4px">
+      <input type="text" placeholder="INPUT:" style="width:100%">
+    </div>
+    <input type="range" min="0" max="100" value="50" style="margin-top:4px;cursor:pointer">
+  </div>
+
+  <div class="outset" style="margin-top:8px">
+    <div class="title">TERMINAL</div>
+    <div class="inset" style="height:60px;overflow-y:auto;font-size:9px;line-height:1.3">
+      >[SYSTEM ONLINE]<br>
+      >[WELCOME VAULT DWELLER]<br>
+      >[SCANNING ENVIRONMENT]<br>
+      >[HOSTILES DETECTED: 3]<br>
+      >[RADIATION: 12 REM]<br>
+    </div>
+  </div>
+</div>
+
+<div class="outset table-panel">
+  <div class="title">INVENTORY</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 20px;"></th>
+        <th>NAME</th>
+        <th style="width: 60px; text-align: right;">WEIGHT</th>
+        <th style="width: 60px; text-align: right;">VALUE</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">
+    </tbody>
+  </table>
+</div>
+
+<div class="outset" style="margin-top:8px">
+  <div class="title">COMPONENT SHOWCASE</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+    <div>
+      <div style="font-size: 9px; color: var(--muted); margin-bottom: 4px;">RESOURCE BARS</div>
+      <resource-bar label="Base Bar" value="50" max="100"></resource-bar>
+      <resource-bar-primary label="Primary" value="87" max="100"></resource-bar-primary>
+      <resource-bar-secondary label="Secondary" value="60" max="80"></resource-bar-secondary>
+      <resource-bar-tertiary label="Tertiary" value="25" max="40"></resource-bar-tertiary>
+    </div>
+    <div>
+      <div style="font-size: 9px; color: var(--muted); margin-bottom: 4px;">RESOURCE QUANTITIES</div>
+      <resource-quant label="Base" quant="100"></resource-quant>
+      <resource-quant-primary label="Primary" quant="1250"></resource-quant-primary>
+      <resource-quant-secondary label="Secondary" quant="847"></resource-quant-secondary>
+      <resource-quant-tertiary label="Tertiary" quant="42"></resource-quant-tertiary>
+    </div>
+    <div>
+      <div style="font-size: 9px; color: var(--muted); margin-bottom: 4px;">STATUS EFFECTS</div>
+      <status-effect label="Base" info="Info"></status-effect>
+      <status-effect-primary label="CRITICAL" info="ACTIVE"></status-effect-primary>
+      <status-effect-secondary label="BUFFED" info="+5 STR"></status-effect-secondary>
+      <status-effect-tertiary label="MINOR" info="3s"></status-effect-tertiary>
+    </div>
+    <div>
+      <div style="font-size: 9px; color: var(--muted); margin-bottom: 4px;">BUTTONS</div>
+      <primary-button text="Primary"></primary-button>
+      <secondary-button text="Secondary"></secondary-button>
+      <tertiary-button text="Tertiary"></tertiary-button>
+    </div>
+  </div>
+</div>
+
+</body>
+
+</html>
+
+
+
+
+
+
+<script>
+
+function populateTable(containerId, itemsArray, WebComponentName) {
+  const tbody = document.querySelector(`#${containerId}`);
+  tbody.innerHTML = '';
+  
+  itemsArray.forEach(item => {
+    const row = document.createElement('tr');
+    const component = document.createElement(WebComponentName);
+    component.data = item;
+    row.appendChild(component);
+    tbody.appendChild(row);
+  });
+}
+
+const tableItems = [
+  {
+    id: 'laser-rifle',
+    name: 'Laser Rifle',
+    weight: 8.5,
+    value: 750,
+    icon: '⚔'
+  },
+  {
+    id: 'combat-suit',
+    name: 'Combat Suit',
+    weight: 12.0,
+    value: 500,
+    icon: '■'
+  }
+];
+
+populateTable('table-body', tableItems, 'table-row');
+</script>
+
+
+
+
+
