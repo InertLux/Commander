@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pixi + Konva Tilemap</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #container {
+      position: relative;
+      width: 512px;
+      height: 512px;
+      border: 1px solid #444;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <div id="pixi-root"></div>
+  <div id="konva-root"></div>
+</div>
+
+<!-- Konva still loads normally -->
+<script src="/konva/konva.min.js"></script>
+
+<!-- PIXI v8 must be imported as a module -->
+<script type="module">
+  import * as PIXI from "/pixi/pixi.min.mjs";
+
+  const TILE = 32;
+  const W = 16;
+  const H = 16;
+
+  // Simple checkerboard tilemap
+  const map = [];
+  for (let y = 0; y < H; y++) {
+    const row = [];
+    for (let x = 0; x < W; x++) {
+      row.push((x + y) % 2);
+    }
+    map.push(row);
+  }
+
+  // ---------------- PIXI v8 ----------------
+  const app = new PIXI.Application();
+  await app.init({
+    width: W * TILE,
+    height: H * TILE,
+    background: "#222"
+  });
+
+  document.getElementById("pixi-root").appendChild(app.canvas);
+
+  const tiles = new PIXI.Graphics();
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      tiles.rect(x * TILE, y * TILE, TILE, TILE)
+           .fill(map[y][x] ? 0x555555 : 0x333333);
+    }
+  }
+  app.stage.addChild(tiles);
+
+  // ---------------- KONVA ----------------
+  const stage = new Konva.Stage({
+    container: "konva-root",
+    width: W * TILE,
+    height: H * TILE
+  });
+
+  const layer = new Konva.Layer();
+  stage.add(layer);
+
+  const selector = new Konva.Rect({
+    x: 0,
+    y: 0,
+    width: TILE,
+    height: TILE,
+    stroke: "yellow",
+    strokeWidth: 2,
+    listening: false
+  });
+
+  layer.add(selector);
+  layer.draw();
+
+  stage.on("mousemove", () => {
+    const pos = stage.getPointerPosition();
+    const tx = Math.floor(pos.x / TILE);
+    const ty = Math.floor(pos.y / TILE);
+    selector.position({ x: tx * TILE, y: ty * TILE });
+    layer.batchDraw();
+  });
+
+  stage.on("click", () => {
+    const pos = stage.getPointerPosition();
+    const tx = Math.floor(pos.x / TILE);
+    const ty = Math.floor(pos.y / TILE);
+    console.log("Clicked tile:", tx, ty);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+Web Components: Served by express at /WebComponents
+Component var icon is resolved as /game-icons-net/{icon} (Served by express)
+Buttons:
+icon-button include: src="WebComponents/Buttons/IconButton.js" element: icon-button icon="wooden-sign.svg"> A simple 32px button with a white icon. Emits 'icon-click'
+holo-button include: src="WebComponents/Buttons/HoloButton.js" element: holo-button icon="android-mask.svg" size="64" icon-color="yellow"> A fun Holographic button. Emits: 'icon-click'
+
+Data Input:
+float-field : include: src="" element: float-field  value="3.14" min="0" max="10" step="0.01" placeholder="float">, float input field, Functions: value: get/set, Emits: "change", detail: { value: floatValue }...
+int-field :  include: src="" element: int-field value="42" min="0" max="100" step="1"  placeholder="int" >,int input field, Functions: value: get/set, Emits: "change", detail: { value: intValue }...
+
+text-field :  include: src="" element: text-field, text input field, Functions: value: get/set, Emits: "change", detail: { value: intValue }...
+select-field :  include: src="" element: select-field, Functions: options: get/set, value: get/set, display: get/set Emits: change", detail: { value: this.value }...
+select-field: Use:  <script>
+                    const selectField = document.getElementById("selectField");
+                    selectField.options = ["Red", "Green", "Blue"];
+
+                    selectField.display = {
+                      placeholder: "Pick a color",
+                      Red:   { color: "red" },
+                      Green: { color: "green" },
+                      Blue:  { color: "blue" }
+                    };
+                </script>
+
+TODO:
+path-field :  include: src="" element: path-field path input field Emits: 'icon-click'
+image-field :  include: src="" element: float-field A float input field Emits: 'icon-click'
+icon-field :  include: src="" element: float-field A float input field Emits: 'icon-click'
+3d-mesh-field :  include: src="" element: float-field A float input field Emits: 'icon-click'
+asset-path-field :  include: src="" element: float-field A float input field Emits: 'icon-click'
+
+Panels: 
+paper
+vault
+wood
+
+Views:
+scene
+[meadow, dungeon, town-square, town-office, city-square, city-bank, city-court]
+
+Render Rooms:
+Room... using three or something. 
+
+Terminal: 
+CommanderTerminal   <!-- Load the terminal web component -->
+  <script type="module" src="/WebComponents/CommanderTerminal.js"></script>
+
+  <!-- Use the terminal -->
+  <idm-terminal></idm-terminal>

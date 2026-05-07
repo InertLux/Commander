@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pip-Boy Pokémon Combat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .pipboy-container {
+            width: 900px;
+            height: 700px;
+            background-color: #1a1a1a;
+            border: 3px solid #00FF00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5), inset 0 0 20px rgba(0, 255, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pipboy-header {
+            text-align: center;
+            border-bottom: 2px solid #00FF00;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+
+        .combat-arena {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 350px;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #00FF00;
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+            position: relative;
+        }
+
+        .combat-arena::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                #00FF00,
+                #00FF00 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            bottom: 100px;
+            opacity: 0.3;
+        }
+
+        .pokemon-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .pokemon-enemy {
+            align-items: flex-start;
+        }
+
+        .pokemon-player {
+            align-items: flex-end;
+        }
+
+        .pokemon-display {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #00FF00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin: 10px;
+            background: rgba(0, 255, 0, 0.05);
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.2);
+            position: relative;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.97; }
+        }
+
+        .pokemon-info {
+            width: 200px;
+            border: 2px solid #00FF00;
+            padding: 10px;
+            background: rgba(0, 255, 0, 0.03);
+            margin-top: 10px;
+        }
+
+        .pokemon-name {
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .hp-bar {
+            width: 100%;
+            height: 20px;
+            border: 1px solid #00FF00;
+            background-color: #000000;
+            margin-top: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hp-fill {
+            height: 100%;
+            background-color: #00FF00;
+            width: 100%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+        }
+
+        .hp-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .controls-section {
+            border: 2px solid #00FF00;
+            padding: 15px;
+            background: rgba(0, 255, 0, 0.03);
+        }
+
+        .action-label {
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+        }
+
+        .move-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .move-btn {
+            padding: 12px;
+            background-color: #000000;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.6);
+            box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.1);
+        }
+
+        .move-btn:hover {
+            background-color: #003300;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8), inset 0 0 10px rgba(0, 255, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .move-btn:active {
+            transform: scale(0.98);
+        }
+
+        .battle-log {
+            height: 60px;
+            border: 1px solid #00FF00;
+            background-color: #000000;
+            padding: 8px;
+            font-size: 11px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .log-entry.action {
+            color: #00FF00;
+            text-shadow: 0 0 3px rgba(0, 255, 0, 0.8);
+        }
+
+        .log-entry.damage {
+            color: #FFAA00;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #00FF00;
+            margin-right: 5px;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="pipboy-container">
+        <div class="pipboy-header">
+            <span class="status-indicator"></span>COMBAT ANALYSIS SYSTEM
+        </div>
+
+        <div class="combat-arena">
+            <div class="pokemon-section pokemon-enemy">
+                <div class="pokemon-display">💥</div>
+                <div class="pokemon-info">
+                    <div class="pokemon-name">CHARIZARD-7</div>
+                    <div class="stat-line">
+                        <span>LV: 42</span>
+                        <span>HP:</span>
+                    </div>
+                    <div class="hp-bar">
+                        <div class="hp-fill" style="width: 100%;"></div>
+                        <div class="hp-text">85/85</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pokemon-section pokemon-player">
+                <div class="pokemon-display">⚡</div>
+                <div class="pokemon-info">
+                    <div class="pokemon-name">PIKACHU-3</div>
+                    <div class="stat-line">
+                        <span>LV: 45</span>
+                        <span>HP:</span>
+                    </div>
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="playerHp" style="width: 75%;"></div>
+                        <div class="hp-text">60/80</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="action-label">> SELECT ACTION</div>
+            <div class="move-buttons">
+                <button class="move-btn" onclick="executeMove('THUNDERBOLT')">THUNDERBOLT</button>
+                <button class="move-btn" onclick="executeMove('QUICK ATTACK')">QUICK ATTACK</button>
+                <button class="move-btn" onclick="executeMove('THUNDER WAVE')">THUNDER WAVE</button>
+                <button class="move-btn" onclick="executeMove('IRON TAIL')">IRON TAIL</button>
+            </div>
+
+            <div class="action-label">> BATTLE LOG</div>
+            <div class="battle-log" id="battleLog">
+                <div class="log-entry action">> Combat initialized...</div>
+                <div class="log-entry action">> Enemy CHARIZARD detected.</div>
+                <div class="log-entry">Scanning vital signs...</div>
+            </div>
+        </div>
+
+        <div class="scanlines"></div>
+    </div>
+
+    <script>
+        const battleLog = document.getElementById('battleLog');
+        let moveCount = 0;
+
+        function addLog(text, type = 'action') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = '> ' + text;
+            battleLog.appendChild(entry);
+            battleLog.scrollTop = battleLog.scrollHeight;
+
+            if (battleLog.children.length > 8) {
+                battleLog.removeChild(battleLog.firstChild);
+            }
+        }
+
+        function executeMove(moveName) {
+            moveCount++;
+            addLog(`PIKACHU used ${moveName}!`, 'action');
+
+            // Random damage calculation
+            const damage = Math.floor(Math.random() * 25) + 15;
+            const accuracy = Math.floor(Math.random() * 100);
+
+            setTimeout(() => {
+                if (accuracy > 15) {
+                    addLog(`CHARIZARD took ${damage} damage!`, 'damage');
+                    
+                    // Simulate enemy counterattack
+                    setTimeout(() => {
+                        addLog(`CHARIZARD used FLAMETHROWER!`, 'action');
+                        const enemyDamage = Math.floor(Math.random() * 20) + 12;
+                        addLog(`PIKACHU took ${enemyDamage} damage!`, 'damage');
+                        
+                        // Update player HP bar
+                        const playerHpBar = document.getElementById('playerHp');
+                        playerHpBar.style.width = (70 - moveCount * 8) + '%';
+                    }, 800);
+                } else {
+                    addLog(`Attack missed!`, 'damage');
+                }
+            }, 400);
+        }
+
+        // Initial animation
+        window.addEventListener('load', () => {
+            addLog('Ready for combat...');
+        });
+    </script>
+</body>
+</html>

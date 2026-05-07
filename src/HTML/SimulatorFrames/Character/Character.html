@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pip-Boy 3000 - Character Sheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #0a0a0a;
+            color: #0b551e;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .pipboy-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 3px solid #00ff41;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #00ff41;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar-frame {
+            width: 280px;
+            height: 320px;
+            border: 3px solid #00ff41;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 255, 65, 0.02));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 0 20px rgba(0, 255, 65, 0.4),
+                inset 0 0 20px rgba(0, 255, 65, 0.1),
+                0 0 40px rgba(0, 255, 65, 0.2);
+        }
+
+        .avatar-frame::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(0, 255, 65, 0.1) 50%,
+                transparent 70%
+            );
+            animation: holographicShift 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes holographicShift {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: translate(10px, 10px) rotate(1deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 240px;
+            height: 280px;
+            z-index: 2;
+        }
+
+        .pokemon-avatar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 25%, #ffeb3b 50%, #4caf50 75%, #2196f3 100%);
+            border-radius: 50% 50% 45% 45%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            filter: drop-shadow(0 8px 16px rgba(0, 255, 65, 0.4));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .avatar-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50% 50% 45% 45%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent);
+            z-index: 1;
+        }
+
+        .avatar-shadow {
+            position: absolute;
+            bottom: -30px;
+            width: 80%;
+            height: 20px;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 65, 0.4), transparent);
+            border-radius: 50%;
+            filter: blur(8px);
+        }
+
+        .avatar-name {
+            text-align: center;
+            border-top: 1px solid #00ff41;
+            border-bottom: 1px solid #00ff41;
+            padding: 10px 0;
+            width: 100%;
+        }
+
+        .avatar-name input {
+            width: 90%;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .avatar-name input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .avatar-stats {
+            width: 100%;
+            border: 1px solid #00ff41;
+            padding: 10px;
+            background: rgba(0, 255, 65, 0.05);
+            border-radius: 5px;
+            font-size: 0.85em;
+        }
+
+        .avatar-stat-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed rgba(0, 255, 65, 0.3);
+        }
+
+        .avatar-stat-line:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .content-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            border: 2px solid #00ff41;
+            padding: 15px;
+            background: rgba(0, 255, 65, 0.05);
+            border-radius: 5px;
+        }
+
+        .section h2 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stat-box {
+            text-align: center;
+            border: 1px solid #00ff41;
+            padding: 10px;
+            border-radius: 3px;
+            background: rgba(0, 255, 65, 0.02);
+        }
+
+        .stat-box label {
+            display: block;
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-box input {
+            width: 100%;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5em;
+            text-align: center;
+            border-radius: 3px;
+            transition: box-shadow 0.3s;
+        }
+
+        .stat-box input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field label {
+            font-size: 0.85em;
+            margin-bottom: 3px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-field input,
+        .input-field textarea {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            border-radius: 3px;
+            transition: box-shadow 0.3s;
+        }
+
+        .input-field input:focus,
+        .input-field textarea:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px dashed #00ff41;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .skill-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .skill-name {
+            flex: 1;
+        }
+
+        .skill-value {
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #00cc33);
+            width: 75%;
+            transition: width 0.3s;
+            text-align: center;
+            font-size: 0.7em;
+            line-height: 20px;
+            color: #0a0a0a;
+            font-weight: bold;
+        }
+
+        .inventory-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .inventory-item {
+            padding: 8px;
+            border-bottom: 1px dashed #00ff41;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .inventory-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: rgba(0, 255, 65, 0.2);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            border-radius: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background: rgba(0, 255, 65, 0.4);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .quest-item {
+            padding: 8px;
+            border-left: 3px solid #00ff41;
+            margin-bottom: 8px;
+            padding-left: 12px;
+            font-size: 0.9em;
+            background: rgba(0, 255, 65, 0.02);
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .content-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .pipboy-container {
+                padding: 15px;
+            }
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 9999;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 65, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 65, 0.5);
+        }
+    </style>
+</head>
+
+    <div class="scanlines"></div>
+    <div class="pipboy-container">
+        <div class="header">
+            <h1>PIP-BOY 3000</h1>
+            <p>PERSONAL INFORMATION PROCESSOR</p>
+        </div>
+
+        <!-- Main Grid: Avatar + Content -->
+        <div class="main-grid">
+            <!-- Avatar Section -->
+            <div class="avatar-section">
+                <div class="avatar-frame">
+                    <div class="avatar-container">
+                        <div class="pokemon-avatar">🔥</div>
+                        <div class="avatar-glow"></div>
+                        <div class="avatar-shadow"></div>
+                    </div>
+                </div>
+                <div class="avatar-name">
+                    <input type="text" placeholder="Your Name" value="Vault Dweller">
+                </div>
+                <div class="avatar-stats">
+                    <div class="avatar-stat-line">
+                        <span>Level:</span>
+                        <span>1</span>
+                    </div>
+                    <div class="avatar-stat-line">
+                        <span>XP:</span>
+                        <span>0 / 100</span>
+                    </div>
+                    <div class="avatar-stat-line">
+                        <span>HP:</span>
+                        <span>100 / 100</span>
+                    </div>
+                    <div class="avatar-stat-line">
+                        <span>Status:</span>
+                        <span style="color: #4caf50;">Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="content-section">
+                <!-- Character Info -->
+                <div class="section">
+                    <h2>Character Info</h2>
+                    <div class="input-row">
+                        <div class="input-field">
+                            <label>Faction</label>
+                            <input type="text" placeholder="Enter faction" value="Vault 101">
+                        </div>
+                        <div class="input-field">
+                            <label>Race</label>
+                            <input type="text" placeholder="Enter race" value="Human">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-field">
+                            <label>Class</label>
+                            <input type="text" placeholder="Enter class" value="Wanderer">
+                        </div>
+                        <div class="input-field">
+                            <label>Age</label>
+                            <input type="number" placeholder="Enter age" value="19">
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <label>Background</label>
+                        <textarea placeholder="Enter character background" style="height: 60px;">Born and raised in Vault 101, seeking adventure in the wasteland.</textarea>
+                    </div>
+                </div>
+
+                <!-- Health Stats -->
+                <div class="section">
+                    <h2>Health Status</h2>
+                    <div class="stat-box">
+                        <label>Current HP</label>
+                        <input type="number" value="85">
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" style="width: 85%;">85%</div>
+                    </div>
+                    <div class="skill-item" style="margin-top: 15px;">
+                        <span>Radiation:</span>
+                        <span>0 REM</span>
+                    </div>
+                    <div class="skill-item">
+                        <span>Poison:</span>
+                        <span>0</span>
+                    </div>
+                    <div class="skill-item">
+                        <span>Disease:</span>
+                        <span>None</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPECIAL Stats -->
+        <div class="section" style="margin-bottom: 25px;">
+            <h2>S.P.E.C.I.A.L. Attributes</h2>
+            <div class="grid-3">
+                <div class="stat-box">
+                    <label>Strength</label>
+                    <input type="number" value="7" min="1" max="10">
+                </div>
+                <div class="stat-box">
+                    <label>Perception</label>
+                    <input type="number" value="6" min="1" max="10">
+                </div>
+                <div class="stat-box">
+                    <label>Endurance</label>
+                    <input type="number" value="8" min="1" max="10">
+                </div>
+                <div class="stat-box">
+                    <label>Charisma</label>
+                    <input type="number" value="5" min="1" max="10">
+                </div>
+                <div class="stat-box">
+                    <label>Intelligence</label>
+                    <input type="number" value="7" min="1" max="10">
+                </div>
+                <div class="stat-box">
+                    <label>Agility</label>
+                    <input type="number" value="9" min="1" max="10">
+                </div>
+                <div class="stat-box">
+                    <label>Luck</label>
+                    <input type="number" value="6" min="1" max="10">
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="grid-2">
+            <div class="section">
+                <h2>Combat Skills</h2>
+                <div class="skill-item">
+                    <span class="skill-name">Guns</span>
+                    <span class="skill-value">75</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Melee Weapons</span>
+                    <span class="skill-value">65</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Unarmed</span>
+                    <span class="skill-value">55</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Explosives</span>
+                    <span class="skill-value">45</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Energy Weapons</span>
+                    <span class="skill-value">50</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>General Skills</h2>
+                <div class="skill-item">
+                    <span class="skill-name">Barter</span>
+                    <span class="skill-value">60</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Science</span>
+                    <span class="skill-value">70</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Repair</span>
+                    <span class="skill-value">68</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Medicine</span>
+                    <span class="skill-value">62</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Sneak</span>
+                    <span class="skill-value">80</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory & Equipment -->
+        <div class="grid-2">
+            <div class="section">
+                <h2>Equipment</h2>
+                <div class="inventory-item">
+                    <span>Pip-Boy 3000</span>
+                    <span>(Equipped)</span>
+                </div>
+                <div class="inventory-item">
+                    <span>Vault 101 Suit</span>
+                    <span>(Equipped)</span>
+                </div>
+                <div class="inventory-item">
+                    <span>10mm Pistol</span>
+                    <span>(Equipped)</span>
+                </div>
+                <div class="inventory-item">
+                    <span>Ripper</span>
+                    <span>(Ready)</span>
+                </div>
+                <div class="inventory-item">
+                    <span>Laser Rifle</span>
+                    <span>(Stored)</span>
+                </div>
+                <button class="btn-add">+ Add Equipment</button>
+            </div>
+
+            <div class="section">
+                <h2>Inventory</h2>
+                <div class="inventory-list">
+                    <div class="inventory-item">
+                        <span>Stimpack</span>
+                        <span>x5</span>
+                    </div>
+                    <div class="inventory-item">
+                        <span>10mm Round</span>
+                        <span>x47</span>
+                    </div>
+                    <div class="inventory-item">
+                        <span>Fusion Cell</span>
+                        <span>x12</span>
+                    </div>
+                    <div class="inventory-item">
+                        <span>Nuka Cola</span>
+                        <span>x3</span>
+                    </div>
+                    <div class="inventory-item">
+                        <span>RadAway</span>
+                        <span>x2</span>
+                    </div>
+                    <div class="inventory-item">
+                        <span>Bottle Caps</span>
+                        <span>487</span>
+                    </div>
+                    <div class="inventory-item">
+                        <span>Purified Water</span>
+                        <span>x8</span>
+                    </div>
+                    <div class="inventory-item">
+                        <span>Brahmin Steak</span>
+                        <span>x3</span>
+                    </div>
+                </div>
+                <button class="btn-add">+ Add Item</button>
+            </div>
+        </div>
+
+        <!-- Quests & Notes -->
+        <div class="grid-2">
+            <div class="section">
+                <h2>Active Quests</h2>
+                <div class="quest-item">
+                    <strong>Find the G.E.C.K.</strong>
+                    <p style="font-size: 0.8em; margin-top: 3px; opacity: 0.7;">Locate the Garden of Eden Creation Kit for Project Purity</p>
+                </div>
+                <div class="quest-item">
+                    <strong>Escape the Vault</strong>
+                    <p style="font-size: 0.8em; margin-top: 3px; opacity: 0.7;">Leave Vault 101 and survive in the Wasteland</p>
+                </div>
+                <div class="quest-item">
+                    <strong>Help Megaton</strong>
+                    <p style="font-size: 0.8em; margin-top: 3px; opacity: 0.7;">Disarm or activate the nuclear bomb in the town center</p>
+                </div>
+                <button class="btn-add">+ Add Quest</button>
+            </div>
+
+            <div class="section">
+                <h2>Notes & Log</h2>
+                <textarea placeholder="Enter personal notes or journal entries..." style="width: 100%; height: 150px; background: rgba(0, 255, 65, 0.1); border: 1px solid #00ff41; color: #00ff41; padding: 8px; font-family: 'Courier New', monospace; border-radius: 3px; resize: none;">Day 1: Vault door opened. The world outside is vast and dangerous. I must find my father and uncover the truth about Project Purity.</textarea>
+            </div>
+        </div>
+
+        <!-- Perks & Traits -->
+        <div class="section" style="margin-bottom: 25px;">
+            <h2>Perks & Traits</h2>
+            <div class="grid-2">
+                <div>
+                    <h3 style="font-size: 1em; margin-bottom: 10px; color: #00ff41;">Perks</h3>
+                    <div class="skill-item" style="border: none;">
+                        <span>Gun Nut</span>
+                        <span style="color: #ffeb3b;">★★★</span>
+                    </div>
+                    <div class="skill-item" style="border: none;">
+                        <span>Educated</span>
+                        <span style="color: #ffeb3b;">★★</span>
+                    </div>
+                    <div class="skill-item" style="border: none;">
+                        <span>Intense Training</span>
+                        <span style="color: #ffeb3b;">★</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size: 1em; margin-bottom: 10px; color: #00ff41;">Traits</h3>
+                    <div class="skill-item" style="border: none;">
+                        <span>Good Natured</span>
+                        <span style="color: #4caf50;">✓</span>
+                    </div>
+                    <div class="skill-item" style="border: none;">
+                        <span>Lone Wanderer</span>
+                        <span style="color: #4caf50;">✓</span>
+                    </div>
+                    <div class="skill-item" style="border: none;">
+                        <span>Skilled</span>
+                        <span style="color: #4caf50;">✓</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; border-top: 1px solid #00ff41; padding-top: 15px; margin-top: 25px; opacity: 0.7; font-size: 0.85em;">
+            <p>Pip-Boy 3000 | Last Updated: [CURRENT TIME] | Status: OPERATIONAL</p>
+        </div>
+    </div>
+</body>
+</html>

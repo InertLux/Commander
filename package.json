@@ -1,0 +1,42 @@
+{
+    "type": "module",
+    "name": "commander",
+    "version": "1.0.0",
+    
+    "nodemonConfig": {
+        "watch": ["src"],
+        "ignore": ["dist", "node_modules"],
+        "ext": "js,json",
+        "delay": 500
+    },
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "node src/index.js",
+        "dev:watch": "concurrently \"npm run dev\" \"sleep 1 && bash Scripts/Startup.sh\""
+    },
+    "dependencies": {
+        "@pixi/tilemap": "^5.0.2",
+        "better-sqlite3": "^12.9.0",
+        "cytoscape": "^3.33.3",
+        "dotenv": "^17.4.2",
+        "easymde": "^2.20.0",
+        "express": "^5.2.1",
+        "konva": "^10.3.0",
+        "moo": "^0.5.3",
+        "nearley": "^2.20.1",
+        "node-llama-cpp": "^3.18.1",
+        "pngjs": "^7.0.0",
+        "sqlite": "^5.1.1",
+        "terminal.css": "^0.7.5",
+        "three": "^0.184.0",
+        "xterm": "^5.3.0"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^29.0.2",
+        "@rollup/plugin-node-resolve": "^16.0.3",
+        "@rollup/plugin-terser": "^1.0.0",
+        "concurrently": "^9.2.1",
+        "nodemon": "^3.1.14",
+        "rollup": "^4.60.2"
+    }
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cytoscape Relationship Graph</title>
+    <link rel="stylesheet" href="Styles/RelationshipMap.css">
+</head>
+<body>
+
+<div id="leftMenu">
+    <h3>Nodes</h3>
+    <div id="nodeList"></div>
+</div>
+
+<div id="cy"></div>
+
+<div id="rightMenu">
+    <h3>Add Relationship</h3>
+
+    <label>Target Node:</label><br>
+    <select id="targetNode"></select><br><br>
+
+    <label>Type:</label><br>
+    <select id="relType">
+        <option value="love">❤️ Love</option>
+        <option value="hate">🗡️ Hate</option>
+        <option value="home">🏠 Home</option>
+    </select><br><br>
+
+    <label>Strength (1–10):</label><br>
+    <input type="number" id="relStrength" min="1" max="10" value="5"><br><br>
+
+    <button id="addRelBtn">Add</button>
+
+    <h3>Existing Relationships</h3>
+    <div id="relationshipList"></div>
+</div>
+<script type="module" src="Script/RelationshipMap.js"></script>
+</body>
+</html>

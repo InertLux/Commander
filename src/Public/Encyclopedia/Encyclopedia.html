@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Encyclopedia — Index</title>
+
+<link rel="stylesheet" href="Styles/Encyclopedia.css">
+</head>
+
+<body>
+<header>
+  <div class="global-search" role="search">
+    <input id="globalSearch" placeholder="Search entries..." aria-label="Search entries">
+  </div>
+  <div class="brand">Encyclopedia</div>
+</header>
+
+<main>
+  <aside>
+    <iframe id="entriesFrame" src="EncyclopediaEntries.html" title="Entries list"></iframe>
+  </aside>
+
+  <section>
+    <iframe id="pageFrame" src="EncyclopediaPage.html" title="Page content"></iframe>
+  </section>
+
+  <aside>
+    <iframe id="relatedFrame" src="RelatedPages.html" title="Related pages"></iframe>
+  </aside>
+</main>
+
+
+<script type="module" src="Scripts/Encyclopedia.js"></script>
+
+</body>
+</html>
+

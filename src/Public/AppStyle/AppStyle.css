@@ -1,0 +1,136 @@
+/* ================================
+   UNIVERSAL BUTTON DESIGN SYSTEM
+   ================================ */
+
+/* Theme variables */
+:root {
+  --btn-font: "Inter", sans-serif;
+  --btn-radius: 6px;
+
+  --btn-bg: transparent;
+  --btn-bg-hover: rgba(0, 0, 0, 0.08);
+  --btn-bg-active: rgba(0, 0, 0, 0.16);
+
+  --btn-color: #222;
+  --btn-color-disabled: #999;
+
+  --btn-padding-x: 10px;
+  --btn-padding-y: 6px;
+
+  --btn-gap: 6px;
+
+  --btn-transition: 0.15s ease;
+}
+
+/* Base button style (for components exposing <button part="button">) */
+button,
+:host button,
+::part(button) {
+  font-family: var(--btn-font);
+  font-size: 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+
+  background: var(--btn-bg);
+  color: var(--btn-color);
+
+  border: none;
+  border-radius: var(--btn-radius);
+  cursor: pointer;
+
+  transition: background var(--btn-transition), transform var(--btn-transition);
+}
+
+/* Hover */
+button:hover,
+:host button:hover,
+::part(button):hover {
+  background: var(--btn-bg-hover);
+}
+
+/* Active / pressed */
+button:active,
+:host button:active,
+::part(button):active {
+  background: var(--btn-bg-active);
+  transform: scale(0.97);
+}
+
+/* Disabled */
+button:disabled,
+:host button:disabled,
+::part(button):disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--btn-bg);
+  color: var(--btn-color-disabled);
+  transform: none;
+}
+
+/* Focus ring (keyboard accessibility) */
+button:focus-visible,
+:host button:focus-visible,
+::part(button):focus-visible {
+  outline: 2px solid #4a6cff;
+  outline-offset: 2px;
+}
+
+
+/* FIELDS */
+/* Base style for all app-field-* components */
+
+float-field::part(input) {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+float-field::part(input):invalid {
+  border-color: #e66;
+}
+
+int-field::part(input) {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+int-field::part(input):invalid {
+  border-color: #e66;
+}
+
+text-field::part(input) {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+text-field::part(input):invalid {
+  border-color: #e66;
+}
+
+
+select-field::part(select) {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background: white;
+}
+

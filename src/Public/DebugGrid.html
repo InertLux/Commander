@@ -1,0 +1,93 @@
+<style>
+  .debug-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 20px;
+    background: #111;
+    color: #eee;
+    font-family: system-ui, sans-serif;
+  }
+
+  .debug-item {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 20px;
+    background: #111;
+    color: #eee;
+    font-family: system-ui, sans-serif;
+  }
+
+  .debug-item h3 {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    color: #aaa;
+    font-weight: 500;
+  }
+
+  .debug-item > *:not(h3) {
+    display: block;
+    margin: 0 auto;
+  }
+</style>
+
+<div class="debug-grid">
+  <div class="debug-item">
+    <holo-button icon="curly-mask.svg" size="64" icon-color="red"></holo-button>
+    <holo-button icon="android-mask.svg" size="64" icon-color="yellow"></holo-button>
+    <holo-button icon="architect-mask.svg" size="64" icon-color="yellow"></holo-button>
+    <holo-button icon="pumpkin-mask.svg" size="64" icon-color="green"></holo-button>
+  </div>
+
+  <div class="debug-item">
+    <icon-button icon="thumb-up.svg" size="64"></icon-button>
+    <icon-button icon="thumb-down.svg" size="64"></icon-button>
+    <icon-button icon="wheat.svg" size="64"></icon-button>
+    <icon-button icon="metal-bar.svg" size="64"></icon-button>
+    <icon-button icon="wood-pile.svg" size="64"></icon-button>
+    <icon-button icon="coins.svg" size="64"></icon-button>
+  </div>
+
+  <div class="debug-item">
+    <text-field value="Hello world" minlength="2" maxlength="50"></text-field>
+    <float-field value="3.14" min="0" max="10" step="0.01"></float-field>
+    <int-field value="42" min="0" max="100" step="1"></int-field>
+    <select-field id="debugSelect"></select-field>
+  </div>
+
+  <div class="debug-item">
+
+  <gltf-mesh-field style="width: 300px; height: 300px;"></gltf-mesh-field>
+
+  </div>
+
+  <div class="debug-item">
+
+
+  </div>
+
+  <div class="debug-item">
+
+  </div>
+</div>
+
+  <script type="module" src="WebComponents/Buttons/HoloButton.js"></script>
+  <script type="module" src="WebComponents/Buttons/IconButton.js"></script>
+  <script type="module" src="WebComponents/InputFields/FloatField.js"></script>
+  <script type="module" src="WebComponents/InputFields/IntField.js"></script>
+  <script type="module" src="WebComponents/InputFields/TextField.js"></script>
+  <script type="module" src="WebComponents/InputFields/SelectField.js"></script>
+
+  <script type="module" src="WebComponents/InputFields/Advanced/3dMeshField.js"></script>
+
+<script>
+  const debugSelect = document.getElementById("debugSelect");
+  debugSelect.options = ["Red", "Green", "Blue"];
+  debugSelect.display = {
+    placeholder: "Pick a color",
+    Red:   { color: "red" },
+    Green: { color: "green" },
+    Blue:  { color: "blue" }
+  };
+</script>

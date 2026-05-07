@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cozy Pip‑Boy Object Viewer + Hologram</title>
+
+<style>
+  body {
+    background: #000;
+    font-family: "Courier New", monospace;
+    color: #33ff33;
+    margin: 0;
+    padding: 40px;
+  }
+
+  /* Soft room boundary */
+  .room {
+    max-width: 900px;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #229922;
+    box-shadow: 0 0 18px rgba(51,255,51,0.25);
+    position: relative;
+  }
+
+  /* Wireframe corners */
+  .room::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid #229922;
+    clip-path: polygon(
+      0 24px, 24px 0,
+      calc(100% - 24px) 0, 100% 24px,
+      100% calc(100% - 24px), calc(100% - 24px) 100%,
+      24px 100%, 0 calc(100% - 24px)
+    );
+    opacity: 0.22;
+    pointer-events: none;
+  }
+
+  /* Hologram viewport replaces cat image */
+  .object-image {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 260px;
+    height: 200px;
+    border: 1px solid #229922;
+    padding: 4px;
+    background: rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+
+  /* Canvas fills hologram viewport */
+  #holoCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Section label */
+  .label {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+
+  /* Data fields */
+  .data {
+    width: 60%;
+    line-height: 1.45;
+    margin-bottom: 20px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    opacity: 0.9;
+  }
+
+  /* Tiny visualizers */
+  .viz-row {
+    display: flex;
+    gap: 30px;
+    margin-top: 25px;
+  }
+
+  .throbber {
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(51,255,51,0.2);
+    border-top-color: #33ff33;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .progress {
+    width: 120px;
+    height: 6px;
+    border: 1px solid #229922;
+    position: relative;
+  }
+  .progress-fill {
+    width: 55%;
+    height: 100%;
+    background: rgba(51,255,51,0.6);
+  }
+
+  .radar {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #229922;
+    border-radius: 50%;
+    position: relative;
+  }
+  .radar-line {
+    position: absolute;
+    width: 50%;
+    height: 1px;
+    background: #33ff33;
+    top: 50%;
+    left: 50%;
+    transform-origin: left center;
+    animation: sweep 3s linear infinite;
+  }
+  @keyframes sweep { to { transform: rotate(360deg); } }
+
+  .graph {
+    width: 120px;
+    height: 40px;
+    border: 1px solid #229922;
+    overflow: hidden;
+    position: relative;
+  }
+  .graph::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml;utf8,\
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="40">\
+        <polyline points="0,20 10,10 20,30 30,8 40,32 50,18 60,25 70,6 80,34 90,12 100,20 110,8 120,32 130,18 140,25 150,6 160,34 170,12 180,20 190,8 200,32"\
+        fill="none" stroke="%2333ff33" stroke-width="2"/>\
+      </svg>');
+    animation: scroll 4s linear infinite;
+  }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  .topology {
+    width: 120px;
+    height: 80px;
+    border: 1px solid #229922;
+    position: relative;
+  }
+  .node {
+    width: 5px;
+    height: 5px;
+    background: #33ff33;
+    border-radius: 50%;
+    position: absolute;
+  }
+</style>
+</head>
+
+<body>
+<div class="room">
+
+  <!-- Hologram viewport -->
+  <div class="object-image">
+    <canvas id="holoCanvas"></canvas>
+  </div>
+
+  <!-- Data fields -->
+  <div class="label">OBJECT DATA</div>
+  <div class="data">
+    <div class="row"><span>ID</span><span>OBJ‑VAULT‑01</span></div>
+    <div class="row"><span>NAME</span><span>VAULT‑BOY</span></div>
+    <div class="row"><span>TYPE</span><span>HOLOGRAM</span></div>
+    <div class="row"><span>STATUS</span><span>ACTIVE</span></div>
+    <div class="row"><span>ENERGY</span><span>94%</span></div>
+    <div class="row"><span>POSE</span><span>THUMBS‑UP</span></div>
+  </div>
+
+  <!-- Tiny visualizers -->
+  <div class="viz-row">
+
+    <div>
+      <div class="label">ACTIVITY</div>
+      <div class="throbber"></div>
+    </div>
+
+    <div>
+      <div class="label">SCAN</div>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </div>
+
+    <div>
+      <div class="label">RADAR</div>
+      <div class="radar"><div class="radar-line"></div></div>
+    </div>
+
+    <div>
+      <div class="label">SIGNAL</div>
+      <div class="graph"></div>
+    </div>
+
+    <div>
+      <div class="label">TOPO</div>
+      <div class="topology">
+        <div class="node" style="top:10px; left:20px;"></div>
+        <div class="node" style="top:40px; left:60px;"></div>
+        <div class="node" style="top:20px; left:90px;"></div>
+        <div class="node" style="top:60px; left:30px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Three.js Hologram Script -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+  const canvas = document.getElementById("holoCanvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+  camera.position.set(0, 1.2, 3.2);
+  camera.lookAt(0, 0.8, 0);
+
+  const ambient = new THREE.AmbientLight(0x33ff99, 0.4);
+  scene.add(ambient);
+
+  const dirLight = new THREE.DirectionalLight(0x55ffbb, 1.0);
+  dirLight.position.set(3, 5, 3);
+  scene.add(dirLight);
+
+  const holoMaterial = new THREE.MeshPhongMaterial({
+    color: 0x33ff99,
+    emissive: 0x22cc77,
+    emissiveIntensity: 1.8,
+    transparent: true,
+    opacity: 0.55
+  });
+
+  const vaultboy = new THREE.Group();
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), holoMaterial);
+  head.position.set(0, 0.48, 0);
+  vaultboy.add(head);
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.28, 0.1), holoMaterial);
+  body.position.set(0, 0.32, 0);
+  vaultboy.add(body);
+
+  const armGeo = new THREE.BoxGeometry(0.06, 0.22, 0.06);
+  const leftArm = new THREE.Mesh(armGeo, holoMaterial);
+  leftArm.position.set(-0.14, 0.34, 0);
+  vaultboy.add(leftArm);
+
+  const rightArm = new THREE.Mesh(armGeo, holoMaterial);
+  rightArm.position.set(0.14, 0.34, 0);
+  rightArm.rotation.z = -0.6;
+  vaultboy.add(rightArm);
+
+  const legGeo = new THREE.BoxGeometry(0.08, 0.26, 0.08);
+  const leftLeg = new THREE.Mesh(legGeo, holoMaterial);
+  leftLeg.position.set(-0.07, 0.12, 0);
+  const rightLeg = new THREE.Mesh(legGeo, holoMaterial);
+  rightLeg.position.set(0.07, 0.12, 0);
+  vaultboy.add(leftLeg, rightLeg);
+
+  vaultboy.scale.set(0.55, 0.55, 0.55);
+  vaultboy.position.set(0, 0.8, 0);
+  scene.add(vaultboy);
+
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.35, 0.45, 0.08, 24),
+    new THREE.MeshPhongMaterial({
+      color: 0x003311,
+      emissive: 0x116633,
+      emissiveIntensity: 1.0
+    })
+  );
+  base.position.y = 0.4;
+  scene.add(base);
+
+  let time = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.016;
+
+    vaultboy.rotation.y += 0.01;
+    vaultboy.position.y = 0.8 + 0.02 * Math.sin(time * 4);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+</script>
+
+</body>
+</html>

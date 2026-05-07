@@ -1,0 +1,64 @@
+  :root{--panel:#fff;--accent:#0366d6;}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;height:100%;background:transparent;}
+  .wrap{box-sizing:border-box;padding:12px;height:100%;display:flex;flex-direction:column;background:var(--panel);border-radius:8px;}
+  .content{overflow:auto;padding:12px;border-radius:6px;height:100%;}
+  a{color:var(--accent);}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.page-title {
+  font-size: 1.1rem;
+  pointer-events: none;   /* not editable */
+  user-select: text;      /* can still select/copy */
+}
+
+.page-updated {
+  font-weight: 400;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* EasyMDE container fills remaining space */
+.EasyMDEContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.EasyMDEContainer .CodeMirror {
+  height: 100% !important;
+}
+
+/* Optional: make it feel more “document-like” */
+.EasyMDEContainer {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+ /* Editor (CodeMirror) heading sizes */
+.CodeMirror .cm-header-1 { font-size: 1.6em !important; }
+.CodeMirror .cm-header-2 { font-size: 1.4em !important; }
+.CodeMirror .cm-header-3 { font-size: 1.2em !important; }
+.CodeMirror .cm-header-4 { font-size: 1.1em !important; }
+.CodeMirror .cm-header-5 { font-size: 1.05em !important; }
+.CodeMirror .cm-header-6 { font-size: 1em !important; }

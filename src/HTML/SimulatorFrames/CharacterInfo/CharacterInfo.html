@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pip-Boy 3000 - Character Sheet</title>
+<style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #0a0a0a;
+    color: #00ff41;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes holographicShift {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+        transform: translate(10px, 10px) rotate(1deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes bubbleFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes orbitIn {
+    0% {
+        opacity: 0;
+        transform: 
+            translate(-50%, -50%)
+            rotate(var(--angle, 0deg))
+            translateY(calc(var(--distance, 150px) * -1))
+            rotate(calc(var(--angle, 0deg) * -1))
+            scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: 
+            translate(-50%, -50%)
+            rotate(var(--angle, 0deg))
+            translateY(calc(var(--distance, 150px) * -1))
+            rotate(calc(var(--angle, 0deg) * -1))
+            scale(1);
+    }
+}
+
+
+/* ===== MAIN CONTAINER ===== */
+.pipboy-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    border: 3px solid #00ff41;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 30px;
+}
+
+.header {
+    text-align: center;
+    border-bottom: 2px solid #00ff41;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    margin-bottom: 5px;
+}
+
+.header p {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* ===== MAIN GRID LAYOUT ===== */
+.main-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+/* ===== AVATAR SECTIONS ===== */
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar-frame {
+    width: 280px;
+    height: 320px;
+    border: 3px solid #00ff41;
+    background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 255, 65, 0.02));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.4), inset 0 0 20px rgba(0, 255, 65, 0.1), 0 0 40px rgba(0, 255, 65, 0.2);
+}
+
+.avatar-frame::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 65, 0.1) 50%, transparent 70%);
+    animation: holographicShift 3s infinite;
+    pointer-events: none;
+}
+
+.avatar-container {
+    position: relative;
+    width: 240px;
+    height: 280px;
+    z-index: 2;
+}
+
+.pokemon-avatar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 25%, #ffeb3b 50%, #4caf50 75%, #2196f3 100%);
+    border-radius: 50% 50% 45% 45%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    filter: drop-shadow(0 8px 16px rgba(0, 255, 65, 0.4));
+    animation: float 3s ease-in-out infinite;
+}
+
+.avatar-frame-center {
+    width: 200px;
+    height: 200px;
+    border: 3px solid #00ff41;
+    background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 255, 65, 0.02));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.4), inset 0 0 20px rgba(0, 255, 65, 0.1), 0 0 40px rgba(0, 255, 65, 0.2);
+}
+
+.avatar-frame-center::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 65, 0.1) 50%, transparent 70%);
+    animation: holographicShift 3s infinite;
+    pointer-events: none;
+}
+
+.avatar-frame-center .pokemon-avatar {
+    width: 180px;
+    height: 180px;
+    font-size: 100px;
+}
+
+.avatar-center {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ===== CHARACTER NAME INPUT ===== */
+.character-name-center {
+    text-align: center;
+}
+
+.character-name-center input {
+    width: 220px;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 8px;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+/* ===== ORBITAL SECTION ===== */
+.orbital-section {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin: 40px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.orbital-container {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    margin: 0 auto;
+}
+
+.orbital-svg {
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 1;
+    position: relative;
+}
+
+.orbital-path {
+    stroke: rgba(0, 255, 65, 0.1);
+    stroke-width: 1;
+    fill: none;
+    stroke-dasharray: 5, 5;
+}
+
+.health-bubble {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100px;
+    height: 100px;
+    animation: orbitIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay, 0s) forwards;
+    transform-origin: center;
+    opacity: 0;
+    transform: 
+        translate(-50%, -50%)
+        rotate(var(--angle, 0deg))
+        translateY(calc(var(--distance, 150px) * -1))
+        rotate(calc(var(--angle, 0deg) * -1))
+        scale(0);
+}
+
+
+.bubble-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--health-color);
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(0, 255, 65, 0.2), rgba(0, 255, 65, 0.05));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 15px rgba(0, 255, 65, 0.1), 0 0 30px var(--health-color);
+    animation: bubbleFloat 3s ease-in-out infinite;
+}
+
+.bubble-label {
+    font-size: 10px;
+    font-weight: bold;
+    color: #00ff41;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+
+.bubble-value {
+    font-size: 11px;
+    color: var(--health-color);
+    font-weight: bold;
+}
+
+.health-bar-container {
+    width: 70px;
+    height: 6px;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid var(--health-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.health-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--health-color), lighten(var(--health-color), 10%));
+    width: 75%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 8px var(--health-color);
+}
+
+.connector {
+    position: absolute;
+    width: 2px;
+    height: var(--distance);
+    left: 50%;
+    top: -100%;
+    margin-left: -1px;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.connector-line {
+    stroke: var(--health-color);
+    stroke-width: 1;
+    stroke-dasharray: 3, 3;
+}
+
+/* ===== STATS GRID ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 20px;
+    border: 2px solid #00ff41;
+    background: rgba(0, 255, 65, 0.05);
+    border-radius: 5px;
+}
+
+.stat-box-simple {
+    text-align: center;
+    border: 1px solid #00ff41;
+    padding: 10px;
+    border-radius: 3px;
+    background: rgba(0, 255, 65, 0.02);
+}
+
+.stat-box-simple label {
+    display: block;
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-box-simple input {
+    width: 100%;
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.2em;
+    text-align: center;
+    border-radius: 3px;
+}
+
+.stat-box-simple input:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+/* ===== SVG STYLES ===== */
+.health-bar-bg {
+    fill: rgba(0, 255, 65, 0.1);
+    stroke: #00ff41;
+    stroke-width: 1;
+}
+
+.health-label {
+    font-size: 12px;
+    fill: #00ff41;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.health-value {
+    font-size: 13px;
+    fill: #00ff41;
+    font-weight: bold;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .orbital-container {
+        width: 100%;
+        height: 400px;
+        max-width: 400px;
+    }
+
+    .orbital-svg {
+        max-width: 400px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+
+    </style>
+</head>
+
+   <body>
+    <div class="scanlines"></div>
+    <div class="pipboy-container">
+        <div class="header">
+            <h1>PIP-BOY 3000</h1>
+            <p>PERSONAL INFORMATION PROCESSOR</p>
+        </div>
+
+        <!-- Central Avatar with Orbital Health Display -->
+        <div class="orbital-section">
+            <!-- Center Avatar -->
+            <div class="avatar-center">
+                <div class="avatar-frame-center">
+                    <div class="pokemon-avatar">🔥</div>
+                    <div class="avatar-glow"></div>
+                    <div class="avatar-shadow"></div>
+                </div>
+                <div class="character-name-center">
+                    <input type="text" placeholder="Your Name" value="Vault Dweller">
+                </div>
+            </div>
+
+            <!-- Orbital container -->
+            <div class="orbital-container" id="orbitalContainer">
+                <!-- Health bubbles will be generated here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Stats Below -->
+        <div class="stats-grid">
+            <div class="stat-box-simple">
+                <label>Level</label>
+                <input type="number" value="1" min="1" max="50">
+            </div>
+            <div class="stat-box-simple">
+                <label>XP</label>
+                <input type="number" value="0" max="1000">
+            </div>
+            <div class="stat-box-simple">
+                <label>Status</label>
+                <input type="text" value="Healthy" readonly>
+            </div>
+            <div class="stat-box-simple">
+                <label>Radiation</label>
+                <input type="number" value="0" min="0">
+            </div>
+        </div>
+    </div>
+<script>
+// SCENE 1: Health Display (full info)
+
+const healthScene = {
+    layout: { centerDistance: 0, bubbleSize: 80, animationDelay: 0.1 },
+    template: `
+        <div class="bubble-content">
+            <div class="health-bar-container">
+                <div class="health-bar-fill" style="width: \${DATA.percentage}%"></div>
+            </div>
+            <div class="bubble-label">\${DATA.label}</div>
+            <div class="bubble-value">\${DATA.value}</div>
+            <div class="bubble-status">\${DATA.status}</div>
+        </div>
+        <svg class="connector" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="50" y1="50" x2="50" y2="0" class="connector-line" />
+        </svg>
+    `,
+    items: {
+        head: { label: 'Head', value: 92, angle: 0, distance: 180, max: 100 },
+        torso: { label: 'Torso', value: 88, angle: 45, distance: 140, max: 100 },
+        rarm: { label: 'R. Arm', value: 85, angle: 90, distance: 200, max: 100 },
+        rleg: { label: 'R. Leg', value: 82, angle: 135, distance: 180, max: 100 },
+        overall: { label: 'Overall', value: 87, angle: 180, distance: 160, max: 100 },
+        lleg: { label: 'L. Leg', value: 95, angle: 225, distance: 180, max: 100 },
+        larm: { label: 'L. Arm', value: 78, angle: 270, distance: 200, max: 100 }
+    },
+    thresholds: [
+        { min: 76, max: 100, color: '#4caf50', label: 'Healthy' },
+        { min: 51, max: 75, color: '#ffeb3b', label: 'Caution' },
+        { min: 26, max: 50, color: '#ff9800', label: 'Injured' },
+        { min: 0, max: 25, color: '#f44336', label: 'Critical' }
+    ]
+};
+
+const inventoryScene = {
+    layout: { centerDistance: 0, bubbleSize: 80, animationDelay: 0.08 },
+    template: `
+        <div class="bubble-content">
+            <div class="bubble-label">\${DATA.label}</div>
+            <div class="bubble-value" style="font-size: 24px;">\${DATA.value}</div>
+        </div>
+    `,
+    items: {
+        caps: { label: 'Caps', value: 2500, angle: 0, distance: 180, max: 9999 },
+        ammo: { label: 'Ammo', value: 450, angle: 90, distance: 180, max: 1000 },
+        stimpacks: { label: 'Stimpacks', value: 8, angle: 180, distance: 180, max: 20 },
+        radaway: { label: 'RadAway', value: 3, angle: 270, distance: 180, max: 20 }
+    },
+    thresholds: [
+        { min: 50, max: 100, color: '#4caf50', label: 'Plentiful' },
+        { min: 25, max: 49, color: '#ffeb3b', label: 'Moderate' },
+        { min: 1, max: 24, color: '#ff9800', label: 'Low' },
+        { min: 0, max: 0, color: '#f44336', label: 'None' }
+    ]
+};
+
+const skillScene = {
+    layout: { centerDistance: 0, bubbleSize: 80, animationDelay: 0.12 },
+    template: `
+        <div class="bubble-content">
+            <div class="health-bar-container">
+                <div class="health-bar-fill" style="width: \${DATA.percentage}%"></div>
+            </div>
+            <div class="bubble-label">\${DATA.label}</div>
+        </div>
+    `,
+    items: {
+        strength: { label: 'STR', value: 7, angle: 0, distance: 180, max: 10 },
+        perception: { label: 'PER', value: 6, angle: 51.4, distance: 180, max: 10 },
+        endurance: { label: 'END', value: 8, angle: 102.8, distance: 180, max: 10 },
+        charisma: { label: 'CHA', value: 5, angle: 154.2, distance: 180, max: 10 },
+        intelligence: { label: 'INT', value: 9, angle: 205.6, distance: 180, max: 10 },
+        agility: { label: 'AGI', value: 7, angle: 257, distance: 180, max: 10 },
+        luck: { label: 'LCK', value: 6, angle: 308.4, distance: 180, max: 10 }
+    },
+    thresholds: [
+        { min: 8, max: 10, color: '#4caf50', label: 'Excellent' },
+        { min: 6, max: 7, color: '#ffeb3b', label: 'Good' },
+        { min: 4, max: 5, color: '#ff9800', label: 'Fair' },
+        { min: 0, max: 3, color: '#f44336', label: 'Poor' }
+    ]
+};
+
+const resourceScene = {
+    layout: { centerDistance: 0, bubbleSize: 80, animationDelay: 0.1 },
+    template: `
+        <div class="bubble-content">
+            <div class="health-bar-container">
+                <div class="health-bar-fill" style="width: \${DATA.percentage}%"></div>
+            </div>
+            <div class="bubble-label">\${DATA.label}</div>
+            <div class="bubble-value">\${DATA.percentage}%</div>
+        </div>
+        <svg class="connector" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="50" y1="50" x2="50" y2="0" class="connector-line" />
+        </svg>
+    `,
+    items: {
+        water: { label: 'Water', value: 75, angle: 0, distance: 180, max: 100 },
+        food: { label: 'Food', value: 60, angle: 90, distance: 180, max: 100 },
+        sleep: { label: 'Sleep', value: 45, angle: 180, distance: 180, max: 100 },
+        morale: { label: 'Morale', value: 82, angle: 270, distance: 180, max: 100 }
+    },
+    thresholds: [
+        { min: 75, max: 100, color: '#4caf50', label: 'Good' },
+        { min: 50, max: 74, color: '#ffeb3b', label: 'OK' },
+        { min: 25, max: 49, color: '#ff9800', label: 'Bad' },
+        { min: 0, max: 24, color: '#f44336', label: 'Critical' }
+    ]
+};
+
+
+
+
+
+
+
+
+// === GENERIC STATUS SYSTEM ===
+class StatusBubbleSystem {
+    constructor(config, containerId = 'orbitalContainer') {
+        this.config = config;
+        this.container = document.getElementById(containerId);
+        this.bubbles = new Map();
+    }
+
+    getColorAndLabel(value, max = 100) {
+        const percentage = (value / max) * 100;
+        const threshold = this.config.thresholds.find(
+            t => percentage >= t.min && percentage <= t.max
+        );
+        return threshold || this.config.thresholds[this.config.thresholds.length - 1];
+    }
+
+    buildBubbleHTML(itemId, itemData, colorInfo) {
+        const percentage = ((itemData.value / itemData.max) * 100).toFixed(0);
+        
+        // Create data object for template substitution
+        const data = {
+            percentage,
+            label: itemData.label,
+            value: itemData.value,
+            status: colorInfo.label,
+            color: colorInfo.color,
+            id: itemId
+        };
+
+        // Replace all ${DATA.key} with actual values
+        return this.config.template.replace(/\${DATA\.(\w+)}/g, (match, key) => {
+            return data[key] !== undefined ? data[key] : match;
+        });
+    }
+
+    render() {
+        if (!this.container) {
+            console.error('Container not found');
+            return;
+        }
+        
+        this.container.innerHTML = '';
+        let index = 0;
+
+        for (const [itemId, itemData] of Object.entries(this.config.items)) {
+            console.log("Rendering: ", itemId)
+
+            const colorInfo = this.getColorAndLabel(itemData.value, itemData.max);
+            const bubble = document.createElement('div');
+            bubble.className = 'health-bubble';
+            bubble.id = `bubble-${itemId}`;
+            bubble.setAttribute('data-item-id', itemId);
+            bubble.setAttribute('data-value', itemData.value);
+            bubble.style.setProperty('--health-color', colorInfo.color);
+            bubble.style.setProperty('--angle', `${itemData.angle}deg`);
+            bubble.style.setProperty('--distance', `${itemData.distance}px`);
+            bubble.style.setProperty('--delay', `${index * this.config.layout.animationDelay}s`);
+
+            bubble.innerHTML = this.buildBubbleHTML(itemId, itemData, colorInfo);
+
+            this.container.appendChild(bubble);
+            this.bubbles.set(itemId, bubble);
+            index++;
+        }
+    }
+
+    updateItem(itemId, newValue) {
+        const item = this.config.items[itemId];
+        if (!item) {
+            console.warn(`Item "${itemId}" not found in config`);
+            return;
+        }
+
+        item.value = Math.max(0, Math.min(newValue, item.max));
+        const colorInfo = this.getColorAndLabel(item.value, item.max);
+        const bubble = this.bubbles.get(itemId);
+
+        if (bubble) {
+            bubble.setAttribute('data-value', item.value);
+            bubble.style.setProperty('--health-color', colorInfo.color);
+            bubble.innerHTML = this.buildBubbleHTML(itemId, item, colorInfo);
+        }
+    }
+
+    getItem(itemId) {
+        return this.config.items[itemId];
+    }
+
+    getAllItems() {
+        return JSON.parse(JSON.stringify(this.config.items));
+    }
+
+    setConfig(newConfig) {
+        this.config = newConfig;
+        this.render();
+    }
+}
+
+// === INITIALIZATION ===
+let statusSystem;
+
+// Switch scenes - template is re-rendered automatically
+function switchScene(sceneId) {
+    if (!statusSystem) {
+        console.error('Status system not initialized');
+        return;
+    }
+
+    switch(sceneId) {
+        case 'health':
+            statusSystem.setConfig(healthScene);
+            break;
+        case 'inventory':
+            statusSystem.setConfig(inventoryScene);
+            break;
+        case 'skills':
+            statusSystem.setConfig(skillScene);
+            break;
+        case 'resources':
+            statusSystem.setConfig(resourceScene);
+            break;
+        default:
+            console.warn(`Unknown scene: ${sceneId}`);
+    }
+}
+
+async function Load(Scene) {
+    statusSystem = new StatusBubbleSystem(Scene);
+}
+async function doRender() {
+    await Load(resourceScene)
+        statusSystem.render();
+}
+
+window.addEventListener('load', () => {
+    doRender();
+});
+
+
+    </script>
+</body>
+

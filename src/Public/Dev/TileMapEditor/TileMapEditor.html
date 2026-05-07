@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Minecraft-Style 2D Chunk + Chisel Editor</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #222;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #toolbar {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 2px solid #444;
+      cursor: pointer;
+    }
+
+    .swatch.selected {
+      border-color: #fff;
+      box-shadow: 0 0 6px #fff;
+    }
+
+    #map {
+      display: grid;
+      grid-template-columns: repeat(16, 24px);
+      grid-template-rows: repeat(16, 24px);
+      gap: 2px;
+      background: #111;
+      padding: 6px;
+      border-radius: 6px;
+      border: 2px solid #555;
+    }
+
+    .chunk {
+      width: 24px;
+      height: 24px;
+      background: #333;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .chunk:hover {
+      outline: 1px solid #fff5;
+    }
+
+    /* Overlay for chisel editor */
+    #detailOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000a;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    #detailPanel {
+      background: #222;
+      border-radius: 8px;
+      border: 2px solid #555;
+      padding: 12px;
+      min-width: 400px;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #detailHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    #detailChunks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .detail-chunk {
+      background: #111;
+      border-radius: 4px;
+      padding: 4px;
+      border: 1px solid #444;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detail-chunk-title {
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .detail-block-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 10px);
+      grid-template-rows: repeat(8, 10px);
+      gap: 1px;
+    }
+
+    .detail-block {
+      width: 10px;
+      height: 10px;
+      background: #333;
+      cursor: pointer;
+    }
+
+    .detail-block:hover {
+      outline: 1px solid #fff5;
+    }
+
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>2D Minecraft-Style Chunk + Chisel Editor</h1>
+
+  <div id="toolbar">
+    <span>Block type:</span>
+    <div class="swatch selected" data-color="#3b7a1a" title="Grass"></div>
+    <div class="swatch" data-color="#8b5a2b" title="Dirt"></div>
+    <div class="swatch" data-color="#808080" title="Stone"></div>
+    <div class="swatch" data-color="#1e90ff" title="Water"></div>
+    <div class="swatch" data-color="#f0e68c" title="Sand"></div>
+    <button id="clearBtn">Clear</button>
+  </div>
+
+  <div id="map"></div>
+
+  <!-- Chisel overlay -->
+  <div id="detailOverlay">
+    <div id="detailPanel">
+      <div id="detailHeader">
+        <span id="detailTitle">Chisel Editor</span>
+        <div style="display:flex; gap:6px;">
+          <button id="detailApplyBtn">Apply</button>
+          <button id="detailCloseBtn">Close</button>
+        </div>
+      </div>
+      <div id="detailChunks"></div>
+    </div>
+  </div>
+
+  <script>
+    const mapEl = document.getElementById('map');
+    const swatches = Array.from(document.querySelectorAll('.swatch'));
+    const clearBtn = document.getElementById('clearBtn');
+
+    const detailOverlay = document.getElementById('detailOverlay');
+    const detailChunksEl = document.getElementById('detailChunks');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailApplyBtn = document.getElementById('detailApplyBtn');
+    const detailCloseBtn = document.getElementById('detailCloseBtn');
+
+    const width = 16;
+    const height = 16;
+
+    let currentColor = swatches[0].dataset.color;
+    let isMouseDown = false;
+
+    // store chunk DOM and last "chisel" color per chunk
+    const chunks = [];
+    const lastChiselColor = {}; // key: "x,y" -> color
+
+    function chunkKey(x, y) {
+      return x + ',' + y;
+    }
+
+    // create chunks
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const div = document.createElement('div');
+        div.className = 'chunk';
+        div.dataset.x = x;
+        div.dataset.y = y;
+        div.style.backgroundColor = '#333';
+        mapEl.appendChild(div);
+        chunks.push(div);
+      }
+    }
+
+    // select swatch
+    swatches.forEach(swatch => {
+      swatch.style.backgroundColor = swatch.dataset.color;
+      swatch.addEventListener('click', () => {
+        swatches.forEach(s => s.classList.remove('selected'));
+        swatch.classList.add('selected');
+        currentColor = swatch.dataset.color;
+      });
+    });
+
+    // painting chunks (coarse)
+    mapEl.addEventListener('mousedown', e => {
+      if (!e.target.classList.contains('chunk')) return;
+      paintChunk(e.target);
+      isMouseDown = true;
+    });
+
+    document.addEventListener('mouseup', () => (isMouseDown = false));
+
+    mapEl.addEventListener('mousemove', e => {
+      if (!isMouseDown) return;
+      if (!e.target.classList.contains('chunk')) return;
+      paintChunk(e.target);
+    });
+
+    function paintChunk(chunk) {
+      chunk.style.backgroundColor = currentColor;
+      lastChiselColor[chunkKey(chunk.dataset.x, chunk.dataset.y)] = currentColor;
+    }
+
+    // double-click to open chisel editor
+    mapEl.addEventListener('dblclick', e => {
+      if (!e.target.classList.contains('chunk')) return;
+      const cx = parseInt(e.target.dataset.x, 10);
+      const cy = parseInt(e.target.dataset.y, 10);
+      openChiselEditor(cx, cy);
+    });
+
+    // clear map
+    clearBtn.addEventListener('click', () => {
+      chunks.forEach(c => {
+        c.style.backgroundColor = '#333';
+        delete lastChiselColor[chunkKey(c.dataset.x, c.dataset.y)];
+      });
+    });
+
+    // ---- Chisel editor ----
+
+    let currentChiselRegion = null; // {cx, cy, blocksByChunkKey}
+
+    function openChiselEditor(cx, cy) {
+      currentChiselRegion = {
+        cx,
+        cy,
+        blocksByChunkKey: {}
+      };
+
+      detailTitle.textContent = `Chisel Editor around chunk (${cx}, ${cy})`;
+      detailChunksEl.innerHTML = '';
+
+      // 3x3 region around (cx, cy)
+      for (let ry = cy - 1; ry <= cy + 1; ry++) {
+        for (let rx = cx - 1; rx <= cx + 1; rx++) {
+          if (rx < 0 || ry < 0 || rx >= width || ry >= height) {
+            // out of bounds placeholder
+            const placeholder = document.createElement('div');
+            placeholder.className = 'detail-chunk';
+            placeholder.style.opacity = '0.2';
+            placeholder.innerHTML = '<div class="detail-chunk-title">out of bounds</div>';
+            detailChunksEl.appendChild(placeholder);
+            continue;
+          }
+
+          const key = chunkKey(rx, ry);
+          const chunkDiv = findChunk(rx, ry);
+          const baseColor = chunkDiv ? chunkDiv.style.backgroundColor || '#333' : '#333';
+
+          const chunkContainer = document.createElement('div');
+          chunkContainer.className = 'detail-chunk';
+          const title = document.createElement('div');
+          title.className = 'detail-chunk-title';
+          title.textContent = `Chunk (${rx}, ${ry})`;
+          chunkContainer.appendChild(title);
+
+          const grid = document.createElement('div');
+          grid.className = 'detail-block-grid';
+          chunkContainer.appendChild(grid);
+
+          const blocks = [];
+          currentChiselRegion.blocksByChunkKey[key] = blocks;
+
+          for (let by = 0; by < 8; by++) {
+            for (let bx = 0; bx < 8; bx++) {
+              const b = document.createElement('div');
+              b.className = 'detail-block';
+              b.dataset.chunkX = rx;
+              b.dataset.chunkY = ry;
+              b.dataset.bx = bx;
+              b.dataset.by = by;
+              b.style.backgroundColor = baseColor;
+              grid.appendChild(b);
+              blocks.push(b);
+            }
+          }
+
+          detailChunksEl.appendChild(chunkContainer);
+        }
+      }
+
+      detailOverlay.style.display = 'flex';
+    }
+
+    function findChunk(x, y) {
+      return chunks.find(c => parseInt(c.dataset.x, 10) === x && parseInt(c.dataset.y, 10) === y);
+    }
+
+    // painting inside chisel editor
+    let isChiselMouseDown = false;
+
+    detailChunksEl.addEventListener('mousedown', e => {
+      if (!e.target.classList.contains('detail-block')) return;
+      paintDetailBlock(e.target);
+      isChiselMouseDown = true;
+    });
+
+    detailChunksEl.addEventListener('mousemove', e => {
+      if (!isChiselMouseDown) return;
+      if (!e.target.classList.contains('detail-block')) return;
+      paintDetailBlock(e.target);
+    });
+
+    document.addEventListener('mouseup', () => {
+      isChiselMouseDown = false;
+    });
+
+    function paintDetailBlock(block) {
+      block.style.backgroundColor = currentColor;
+      const cx = block.dataset.chunkX;
+      const cy = block.dataset.chunkY;
+      lastChiselColor[chunkKey(cx, cy)] = currentColor;
+    }
+
+    // apply chisel changes back to chunks (simplified: last color used per chunk)
+    detailApplyBtn.addEventListener('click', () => {
+      if (!currentChiselRegion) return;
+
+      Object.keys(currentChiselRegion.blocksByChunkKey).forEach(key => {
+        const [xStr, yStr] = key.split(',');
+        const x = parseInt(xStr, 10);
+        const y = parseInt(yStr, 10);
+        const chunkDiv = findChunk(x, y);
+        if (!chunkDiv) return;
+
+        const color = lastChiselColor[key];
+        if (color) {
+          chunkDiv.style.backgroundColor = color;
+        }
+      });
+
+      closeChiselEditor();
+    });
+
+    detailCloseBtn.addEventListener('click', closeChiselEditor);
+    detailOverlay.addEventListener('click', e => {
+      if (e.target === detailOverlay) {
+        closeChiselEditor();
+      }
+    });
+
+    function closeChiselEditor() {
+      detailOverlay.style.display = 'none';
+      currentChiselRegion = null;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IDM Commander</title>
+
+  <!-- Load xterm.css -->
+  <link rel="stylesheet" href="/xterm/css/xterm.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+    }
+
+    .navbar {
+      background: #333;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hamburger {
+      cursor: pointer;
+      font-size: 28px;
+      user-select: none;
+    }
+
+    .menu {
+      display: none;
+      flex-direction: column;
+      background: #444;
+    }
+
+    .menu a {
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-bottom: 1px solid #555;
+    }
+
+    .menu a:hover {
+      background: #555;
+    }
+
+    .menu.active {
+      display: flex;
+    }
+
+    /* OUTER CRT FRAME */
+    .crt {
+      width: 600px;
+      height: 450px;
+      margin: 40px auto;
+      background: #111;
+      padding: 1px 0px;
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      border: 6px solid #333;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .crt-warp {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* NEW: mask wrapper */
+    .crt-mask {
+      width: 100%;
+      height: 100%;
+      mask-image: radial-gradient(circle at center,
+        rgba(0,0,0,1) 60%,
+        rgba(0,0,0,0.95) 80%,
+        rgba(0,0,0,0.9) 100%
+      );
+      -webkit-mask-image: radial-gradient(circle at center,
+        rgba(0,0,0,1) 60%,
+        rgba(0,0,0,0.95) 80%,
+        rgba(0,0,0,0.9) 100%
+      );
+    }
+
+    .crt-screen {
+      width: calc(100% - 30px);
+      height: calc(100% - 30px);
+      background: #0a0a0a;
+      color: #33ff33;
+      font-family: "Courier New", monospace;
+      padding: 20px;
+      border-radius: 12px;
+      position: relative;
+
+      display: flex;
+      flex-direction: column;
+
+      text-shadow: 0 0 5px #33ff33;
+      box-shadow: inset 0 0 40px rgba(0,255,0,0.2);
+
+      overflow: hidden;
+
+      /* IMPORTANT: allow clicks */
+      pointer-events: auto;
+
+      /* IMPORTANT: remove mask from here */
+      mask-image: none !important;
+      -webkit-mask-image: none !important;
+    }
+
+    .crt-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+
+      /* IMPORTANT: do NOT block clicks */
+      pointer-events: none;
+
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,0) 2px,
+        rgba(0,0,0,0.15) 3px
+      );
+    }
+
+    #terminal {
+      flex: 1;
+      overflow: hidden;
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div>IDM Commander</div>
+  </div>
+
+  <div class="menu" id="menu">
+    <a href="Encyclopedia/Encyclopedia.html">Encyclopedia</a>
+    <a href="TileMapEditor/TileMapEditor.html">TileMap Editor</a>
+    <a href="RelationshipMap/RelationshipMap.html">Relationship Map</a>
+    <a href="Universe/Universe.html">Universe</a>
+  </div>
+
+  <div class="crt">
+    <div class="crt-warp">
+      <div class="crt-mask">
+        <div id="crt-screen" class="crt-screen">
+          <div id="terminal" tabindex="0"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load xterm.js -->
+  <script src="/xterm/lib/xterm.js"></script>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("menu").classList.toggle("active");
+    }
+
+    const term = new Terminal({
+      cursorBlink: true,
+      cursorStyle: "block",
+      theme: {
+        background: "#000000",
+        foreground: "#33ff33",
+        cursor: "#33ff33",
+      }
+    });
+
+    const terminalEl = document.getElementById("terminal");
+
+    term.open(terminalEl);
+
+    // Focus on click
+    terminalEl.addEventListener("mousedown", () => {
+      terminalEl.focus();
+      term.focus();
+    });
+
+    // Focus on load
+    setTimeout(() => {
+      terminalEl.focus();
+      term.focus();
+    }, 50);
+
+    term.write("IDM Commander Terminal Ready\r\n$ ");
+  </script>
+
+</body>
+</html>

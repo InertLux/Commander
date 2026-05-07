@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simulation Layer Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    margin: 0;
+    background: #000;
+    color: #33ff33;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+  }
+
+  #container {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Optional: a toggle button to show how you'd activate it */
+  #toggleBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 99999;
+    padding: 6px 12px;
+    background: #111;
+    border: 1px solid #229922;
+    color: #33ff33;
+    cursor: pointer;
+    font-family: inherit;
+  }
+</style>
+</head>
+
+<body>
+
+<button id="toggleBtn">Toggle Simulation</button>
+
+<div id="container">
+  <!-- The simulation layer -->
+  <simulation-layer id="sim"></simulation-layer>
+</div>
+
+<!-- Your Web Component -->
+<script type="module" src="WebComponents/Main/SimulationLayer.js"></script>
+<script>
+
+
+
+
+  const sim = document.getElementById("sim");
+  const toggleBtn = document.getElementById("toggleBtn");
+
+  // Demo environment data
+  sim.setEnvironmentData({
+    world: "default",
+    region: "meadow-edge",
+    location: [12, 4, 0],
+    mode: "explore",
+    time: "DAWN",
+    combatState: "PEACEFUL"
+  });
+
+  // Toggle visibility (demo only)
+  let visible = true;
+  toggleBtn.onclick = () => {
+    visible = !visible;
+    sim.style.display = visible ? "grid" : "none";
+  };
+
+  // Listen for scene changes
+  sim.addEventListener("scene-change", e => {
+    console.log("Scene changed:", e.detail.scene);
+  });
+
+  // Example: switch scenes after 3 seconds
+  setTimeout(() => sim.setScene("combat"), 3000);
+  setTimeout(() => sim.setScene("dungeon"), 6000);
+  setTimeout(() => sim.setScene("meadow"), 9000);
+</script>
+
+</body>
+</html>

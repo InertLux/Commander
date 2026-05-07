@@ -1,0 +1,9 @@
+Database is pure user editable.
+
+Schema is saved in Database. 
+Database is filled according to schema. 
+need a way to derrived encyclopedia page for entry. probably best done using encyclopedia table. in metaDB
+
+MetaDB - determines data schemas. Stores editor only data. such as encyclopedia entries...  
+
+

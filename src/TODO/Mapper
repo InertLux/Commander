@@ -1,0 +1,5 @@
+
+Raster image pixel data to be imported to UE as 16 or 8 bit data maps.
+
+image will be edited through HTML page using javascript tools, derrived from Database. 
+Image will be edited using package pngjs or shapr if I'm not satisfied. 

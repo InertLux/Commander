@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+#leftMenu, #rightMenu {
+    width: 220px;
+    background: #f0f0f0;
+    padding: 10px;
+    overflow-y: auto;
+    border-right: 2px solid #ccc;
+}
+
+#rightMenu {
+    border-right: none;
+    border-left: 2px solid #ccc;
+}
+
+#cy {
+    flex: 1;
+    background: #fff;
+}
+
+.relationship-item {
+    padding: 6px;
+    margin-bottom: 10px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
